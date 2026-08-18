@@ -1,18 +1,12 @@
 % Replace the fictional sample content below with your own information.
 
-\begin{minipage}[b]{0.52\linewidth}
-  {\fontsize{23}{24}\selectfont\bfseries 你的名字}\par
-  \vspace{1.5mm}
-  {\color{Muted}\fontsize{10}{11}\selectfont
-    软件工程师\dotsep 2027 届硕士}
-\end{minipage}\hfill
-\begin{minipage}[b]{0.46\linewidth}
-  \raggedleft\fontsize{9.2}{12.6}\selectfont
-  (+86) 138\,0000\,0000\dotsep
-  \plainlink{mailto:you@example.com}{you@example.com}\par
-  \plainlink{https://github.com/yourname}{github.com/yourname}\dotsep
-  \plainlink{https://example.com}{yourname.dev}
-\end{minipage}
+\resumeheader
+  {你的名字}
+  {软件工程师\dotsep 2027 届硕士}
+  {(+86) 138\,0000\,0000}
+  {\headerlink{mailto:you@example.com}{you@example.com}}
+  {\headerlink{https://github.com/yourname}{github.com/yourname}}
+  {\headerlink{https://example.com}{yourname.dev}}
 
 \sectiontitle{教育经历}{Education}
 
@@ -26,11 +20,12 @@
 
 \sectiontitle{专业亮点}{Highlights}
 
-\twocol{%
-  \compline{全国大学生程序设计竞赛}{Gold}{一等奖}{2023.11}%
-  \compline{开源软件创新赛}{Silver}{二等奖}{2024.05}%
+\threecol{%
+  \awardcard{全国大学生程序设计竞赛}{Gold}{一等奖}{2023.11}%
 }{%
-  \compline{校级优秀毕业设计}{Bronze}{优秀奖}{2024.06}%
+  \awardcard{开源软件创新赛}{Silver}{二等奖}{2024.05}%
+}{%
+  \awardcard{校级优秀毕业设计}{Bronze}{优秀奖}{2024.06}%
 }
 
 \sectiontitle{实习经历}{Experience}
@@ -52,7 +47,7 @@
   \item \lead{查询性能：}将多表实时聚合改为事件驱动的读模型，P95 延迟由 \metric{1.8s} 降至 \metric{180ms}。
 \end{itemize}
 
-\vspace{2.1mm}
+\vspace{1.8mm}
 \cventry{B}{星河网络}{数据平台组\thindot 后端工程师}{2024.07\dash2024.10}{实习}
 
 \project{数据资产管理平台}
@@ -64,7 +59,7 @@
 \sectiontitle{个人项目}{Projects}
 
 \cventry{C}{ContextDock}{Coding Agent 本地工作台}{2025.11\dash 至今}{独立开发}
-\vspace{-0.2mm}
+\vspace{-0.35mm}
 \rowline{%
   \linkchip{https://github.com/yourname/contextdock}{github.com/yourname/contextdock}%
 }{%

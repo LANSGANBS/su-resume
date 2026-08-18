@@ -1,38 +1,145 @@
-% Theme tokens. Keep semantic colors here so content never depends on a palette.
+% Semantic color tokens.
+%
+% Switch the whole document by changing \ResumeTheme in resume.tex, or inject
+% it from the command line:
+%   latexmk -xelatex -usepretex='\def\ResumeTheme{forest}' resume.tex
+%
+% Available palettes: ocean, forest, plum, graphite.
 \providecommand{\ResumeTheme}{ocean}
 
-\newcommand{\ThemeAccent}{1A56B0}
-\newcommand{\ThemeAccentSoft}{E8EEF9}
-\newcommand{\ThemeRole}{16755A}
-\newcommand{\ThemeRoleSoft}{E4F1EB}
+\newcommand{\ThemeAccent}{}
+\newcommand{\ThemeAccentStrong}{}
+\newcommand{\ThemeAccentSoft}{}
+\newcommand{\ThemeAccentSurface}{}
+\newcommand{\ThemeSecondary}{}
+\newcommand{\ThemeSecondarySoft}{}
+\newcommand{\ThemeInk}{}
+\newcommand{\ThemeMuted}{}
+\newcommand{\ThemeSubtle}{}
+\newcommand{\ThemeRule}{}
+\newcommand{\ThemeSurface}{}
+\newcommand{\ThemeSurfaceStrong}{}
+\newcommand{\ThemePaper}{}
+\newcommand{\ThemeLink}{}
+\newcommand{\ThemeGold}{}
+\newcommand{\ThemeSilver}{}
+\newcommand{\ThemeBronze}{}
 
-\ifstrequal{\ResumeTheme}{forest}{%
-  \renewcommand{\ThemeAccent}{176B52}%
-  \renewcommand{\ThemeAccentSoft}{E3F1EC}%
-  \renewcommand{\ThemeRole}{8A5A16}%
-  \renewcommand{\ThemeRoleSoft}{F6EEDC}%
-}{}
-\ifstrequal{\ResumeTheme}{plum}{%
-  \renewcommand{\ThemeAccent}{7446A0}%
-  \renewcommand{\ThemeAccentSoft}{F0E9F7}%
-  \renewcommand{\ThemeRole}{A04765}%
-  \renewcommand{\ThemeRoleSoft}{F8E9EF}%
-}{}
-\ifstrequal{\ResumeTheme}{graphite}{%
-  \renewcommand{\ThemeAccent}{374151}%
-  \renewcommand{\ThemeAccentSoft}{ECEFF3}%
-  \renewcommand{\ThemeRole}{596579}%
-  \renewcommand{\ThemeRoleSoft}{E9EDF2}%
-}{}
+\newcommand{\UseOceanTheme}{%
+  \renewcommand{\ThemeAccent}{1769AA}%
+  \renewcommand{\ThemeAccentStrong}{0D4D82}%
+  \renewcommand{\ThemeAccentSoft}{E5F0F8}%
+  \renewcommand{\ThemeAccentSurface}{F4F8FC}%
+  \renewcommand{\ThemeSecondary}{12715B}%
+  \renewcommand{\ThemeSecondarySoft}{E4F3EE}%
+  \renewcommand{\ThemeInk}{17202A}%
+  \renewcommand{\ThemeMuted}{5E6B78}%
+  \renewcommand{\ThemeSubtle}{697682}%
+  \renewcommand{\ThemeRule}{D5DFE8}%
+  \renewcommand{\ThemeSurface}{F7F9FB}%
+  \renewcommand{\ThemeSurfaceStrong}{EDF2F6}%
+  \renewcommand{\ThemePaper}{FFFFFF}%
+  \renewcommand{\ThemeLink}{0D5F9E}%
+  \renewcommand{\ThemeGold}{9B6808}%
+  \renewcommand{\ThemeSilver}{65707B}%
+  \renewcommand{\ThemeBronze}{94522F}%
+}
 
+\newcommand{\UseForestTheme}{%
+  \renewcommand{\ThemeAccent}{1F6A4B}%
+  \renewcommand{\ThemeAccentStrong}{155039}%
+  \renewcommand{\ThemeAccentSoft}{E3F1EA}%
+  \renewcommand{\ThemeAccentSurface}{F4F8F5}%
+  \renewcommand{\ThemeSecondary}{8A5A12}%
+  \renewcommand{\ThemeSecondarySoft}{F7EFDD}%
+  \renewcommand{\ThemeInk}{19231E}%
+  \renewcommand{\ThemeMuted}{5F6E66}%
+  \renewcommand{\ThemeSubtle}{6B776F}%
+  \renewcommand{\ThemeRule}{D3DED7}%
+  \renewcommand{\ThemeSurface}{F7F9F8}%
+  \renewcommand{\ThemeSurfaceStrong}{ECF2EE}%
+  \renewcommand{\ThemePaper}{FFFFFF}%
+  \renewcommand{\ThemeLink}{1D6548}%
+  \renewcommand{\ThemeGold}{95640B}%
+  \renewcommand{\ThemeSilver}{68736D}%
+  \renewcommand{\ThemeBronze}{8E5535}%
+}
+
+\newcommand{\UsePlumTheme}{%
+  \renewcommand{\ThemeAccent}{73459B}%
+  \renewcommand{\ThemeAccentStrong}{573278}%
+  \renewcommand{\ThemeAccentSoft}{F0E8F6}%
+  \renewcommand{\ThemeAccentSurface}{F9F6FB}%
+  \renewcommand{\ThemeSecondary}{A14465}%
+  \renewcommand{\ThemeSecondarySoft}{F8E8EE}%
+  \renewcommand{\ThemeInk}{211B26}%
+  \renewcommand{\ThemeMuted}{6D6471}%
+  \renewcommand{\ThemeSubtle}{7A7180}%
+  \renewcommand{\ThemeRule}{DED5E2}%
+  \renewcommand{\ThemeSurface}{F9F7FA}%
+  \renewcommand{\ThemeSurfaceStrong}{F2EDF4}%
+  \renewcommand{\ThemePaper}{FFFFFF}%
+  \renewcommand{\ThemeLink}{6C3F95}%
+  \renewcommand{\ThemeGold}{9B6808}%
+  \renewcommand{\ThemeSilver}{6E6872}%
+  \renewcommand{\ThemeBronze}{92533A}%
+}
+
+\newcommand{\UseGraphiteTheme}{%
+  \renewcommand{\ThemeAccent}{3F5163}%
+  \renewcommand{\ThemeAccentStrong}{293B4C}%
+  \renewcommand{\ThemeAccentSoft}{E8EEF2}%
+  \renewcommand{\ThemeAccentSurface}{F5F7F8}%
+  \renewcommand{\ThemeSecondary}{6B5B4D}%
+  \renewcommand{\ThemeSecondarySoft}{F1ECE7}%
+  \renewcommand{\ThemeInk}{171A1D}%
+  \renewcommand{\ThemeMuted}{626A73}%
+  \renewcommand{\ThemeSubtle}{6E7780}%
+  \renewcommand{\ThemeRule}{D8DDE2}%
+  \renewcommand{\ThemeSurface}{F8F9FA}%
+  \renewcommand{\ThemeSurfaceStrong}{EDF0F2}%
+  \renewcommand{\ThemePaper}{FFFFFF}%
+  \renewcommand{\ThemeLink}{344E67}%
+  \renewcommand{\ThemeGold}{8F6416}%
+  \renewcommand{\ThemeSilver}{626A72}%
+  \renewcommand{\ThemeBronze}{845943}%
+}
+
+\ifdefstring{\ResumeTheme}{ocean}{%
+  \UseOceanTheme
+}{\ifdefstring{\ResumeTheme}{forest}{%
+  \UseForestTheme
+}{\ifdefstring{\ResumeTheme}{plum}{%
+  \UsePlumTheme
+}{\ifdefstring{\ResumeTheme}{graphite}{%
+  \UseGraphiteTheme
+}{%
+  \PackageError{resume-theme}
+    {Unknown theme '\ResumeTheme'}
+    {Use ocean, forest, plum, or graphite. Falling back to ocean.}%
+  \UseOceanTheme
+}}}}
+
+% Public semantic tokens used by the layout. Content should only reference
+% these names, never palette hex values.
 \definecolor{Accent}{HTML}{\ThemeAccent}
+\definecolor{AccentStrong}{HTML}{\ThemeAccentStrong}
 \definecolor{AccentSoft}{HTML}{\ThemeAccentSoft}
-\definecolor{Role}{HTML}{\ThemeRole}
-\definecolor{RoleSoft}{HTML}{\ThemeRoleSoft}
-\definecolor{Ink}{HTML}{17191C}
-\definecolor{Muted}{HTML}{69717D}
-\definecolor{Rule}{HTML}{D7DCE2}
-\definecolor{Surface}{HTML}{F7F8FA}
-\definecolor{Gold}{HTML}{A97912}
-\definecolor{Silver}{HTML}{697078}
-\definecolor{Bronze}{HTML}{98582F}
+\definecolor{AccentSurface}{HTML}{\ThemeAccentSurface}
+\definecolor{Secondary}{HTML}{\ThemeSecondary}
+\definecolor{SecondarySoft}{HTML}{\ThemeSecondarySoft}
+\definecolor{Ink}{HTML}{\ThemeInk}
+\definecolor{Muted}{HTML}{\ThemeMuted}
+\definecolor{Subtle}{HTML}{\ThemeSubtle}
+\definecolor{Rule}{HTML}{\ThemeRule}
+\definecolor{Surface}{HTML}{\ThemeSurface}
+\definecolor{SurfaceStrong}{HTML}{\ThemeSurfaceStrong}
+\definecolor{Paper}{HTML}{\ThemePaper}
+\definecolor{Link}{HTML}{\ThemeLink}
+\definecolor{Gold}{HTML}{\ThemeGold}
+\definecolor{Silver}{HTML}{\ThemeSilver}
+\definecolor{Bronze}{HTML}{\ThemeBronze}
+
+% Compatibility aliases for existing content extensions.
+\colorlet{Role}{Secondary}
+\colorlet{RoleSoft}{SecondarySoft}

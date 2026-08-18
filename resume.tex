@@ -1,9 +1,11 @@
 % !TEX program = xelatex
 \documentclass[10pt,a4paper,fontset=none]{ctexart}
 
+% Change this one value to ocean, forest, plum, or graphite.
+% A command-line definition takes precedence over this default.
 \providecommand{\ResumeTheme}{ocean}
 
-\usepackage[margin=12mm,top=11mm,bottom=11mm]{geometry}
+\usepackage[margin=12mm,top=10.5mm,bottom=10.5mm]{geometry}
 \usepackage{xcolor,tabularx,array,enumitem,tcolorbox,hyperref,fontspec,etoolbox}
 
 \IfFontExistsTF{texgyreheros-regular.otf}
@@ -25,20 +27,24 @@
 
 \hypersetup{
   colorlinks=true,
-  urlcolor=Accent,
-  linkcolor=Accent,
+  urlcolor=Link,
+  linkcolor=Link,
   pdfborder={0 0 0},
-  pdfauthor={Resume Template},
+  pdfauthor={Resume Template Maintainers},
   pdftitle={Chinese Technical Resume Template}
 }
+\urlstyle{same}
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0pt}
+\raggedbottom
+\pagecolor{Paper}
 \color{Ink}
 
-\newcommand{\lead}[1]{\textbf{#1}}
-\newcommand{\metric}[1]{\textbf{#1}}
-\newcommand{\plainlink}[2]{\href{#1}{\color{Ink}#2}}
+\newcommand{\lead}[1]{{\color{Ink}\bfseries #1}}
+\newcommand{\metric}[1]{{\color{AccentStrong}\bfseries #1}}
+\newcommand{\plainlink}[2]{\href{#1}{{\color{Link}#2}}}
+\newcommand{\headerlink}[2]{\href{#1}{{\color{Link}\bfseries #2}}}
 \newcommand{\dash}{\,\textendash\,}
 \newcommand{\dotsep}{\;\textperiodcentered\;}
 \newcommand{\thindot}{\,\textperiodcentered\,}
@@ -46,117 +52,205 @@
 \newcommand{\extlink}{\,\raisebox{-0.1ex}{$\scriptstyle\nearrow$}}
 \newcommand{\rowline}[2]{\hbox to\linewidth{#1\hfil #2}}
 
+\newcommand{\contactlabel}[1]{%
+  {\color{Subtle}\fontsize{6.6}{7.2}\selectfont\bfseries
+   \addfontfeature{LetterSpace=18}\MakeUppercase{#1}}}
+\newcommand{\contactvalue}[1]{%
+  {\fontsize{8.7}{10.4}\selectfont #1}}
+
+\newcommand{\resumeheader}[6]{%
+  \begin{minipage}[b]{0.43\linewidth}
+    \hbox{%
+      {\color{Accent}\rule[0.55ex]{8.5mm}{1.2pt}}%
+      \hspace{1.6mm}%
+      {\color{Subtle}\fontsize{6.8}{7.4}\selectfont\bfseries
+       \addfontfeature{LetterSpace=22}PROFILE}}%
+    \vspace{1.1mm}\par
+    {\fontsize{23.2}{23.8}\selectfont\bfseries #1}\par
+    \vspace{1.4mm}
+    {\color{Muted}\fontsize{9.7}{10.8}\selectfont #2}
+  \end{minipage}\hfill
+  \begin{minipage}[b]{0.55\linewidth}
+    \raggedleft
+    \begin{tabular}{@{}r@{\hspace{1.25mm}}l@{\hspace{3.2mm}}r@{\hspace{1.25mm}}l@{}}
+      \contactlabel{TEL} &
+      \contactvalue{#3} &
+      \contactlabel{MAIL} &
+      \contactvalue{#4} \\[1.25mm]
+      \contactlabel{GITHUB} &
+      \contactvalue{#5} &
+      \contactlabel{WEB} &
+      \contactvalue{#6}
+    \end{tabular}
+  \end{minipage}\par
+  \vspace{2.15mm}%
+  {\color{Rule}\hrule height 0.45pt}%
+}
+
 \newcommand{\chip}[3]{%
   \tcbox[
     on line,
     nobeforeafter,
     colback=#1,
-    colframe=#1,
-    boxrule=0pt,
-    arc=0.65mm,
+    colframe=#2!18!Paper,
+    boxrule=0.28pt,
+    arc=0.7mm,
     left=1.0mm,
     right=1.0mm,
     top=0.30mm,
     bottom=0.30mm,
     boxsep=0pt
-  ]{\color{#2}\fontsize{7.6}{8.2}\selectfont\bfseries #3}}
-\newcommand{\tagchip}[1]{\chip{AccentSoft}{Accent}{#1}}
-\newcommand{\rolechip}[1]{\chip{RoleSoft}{Role}{#1}}
-\newcommand{\medalchip}[2]{\chip{#1!12!white}{#1}{#2}}
-\newcommand{\linkchip}[2]{\href{#1}{\chip{AccentSoft}{Accent}{#2\extlink}}}
+  ]{\color{#2}\fontsize{7.45}{8.0}\selectfont\bfseries #3}}
+\newcommand{\tagchip}[1]{\chip{AccentSoft}{AccentStrong}{#1}}
+\newcommand{\rolechip}[1]{\chip{SecondarySoft}{Secondary}{#1}}
+\newcommand{\medalchip}[2]{\chip{#1!11!Paper}{#1}{#2}}
+\newcommand{\linkchip}[2]{\href{#1}{\chip{AccentSoft}{Link}{#2\extlink}}}
 
 \newcommand{\brandmark}[2][Accent]{%
   \tcbox[
     on line,
     nobeforeafter,
-    colback=#1!10!white,
-    colframe=#1!16!white,
-    boxrule=0.35pt,
-    arc=0.8mm,
-    width=5.2mm,
-    height=5.2mm,
+    colback=#1!9!Paper,
+    colframe=#1!18!Paper,
+    boxrule=0.32pt,
+    arc=0.9mm,
+    width=5.4mm,
+    height=5.4mm,
     valign=center,
     halign=center,
     boxsep=0pt
-  ]{\color{#1}\fontsize{7.1}{7.1}\selectfont\bfseries #2}}
+  ]{\color{#1}\fontsize{7.0}{7.0}\selectfont\bfseries #2}}
 
 \newcommand{\sectiontitle}[2]{%
-  \vspace{3.8mm}%
+  \vspace{3.25mm}%
   \hbox to\linewidth{%
-    {\color{Accent}\fontsize{12.4}{13}\selectfont\bfseries #1}%
-    \hspace{2.0mm}%
-    {\color{Muted}\fontsize{7.4}{8}\selectfont
-      \addfontfeature{LetterSpace=18}\MakeUppercase{#2}}%
-    \hspace{1.2mm}%
-    {\color{Rule}\leaders\hrule height 4.2pt depth -3.8pt\hfill}%
-  }\par\vspace{1.7mm}}
+    {\color{Accent}\rule[-0.15mm]{1.15mm}{2.75mm}}%
+    \hspace{1.45mm}%
+    {\color{AccentStrong}\fontsize{11.9}{12.6}\selectfont\bfseries #1}%
+    \hspace{1.9mm}%
+    {\color{Subtle}\fontsize{7.15}{7.8}\selectfont\bfseries
+      \addfontfeature{LetterSpace=20}\MakeUppercase{#2}}%
+    \hspace{1.4mm}%
+    {\color{Rule}\leaders\hrule height 4.0pt depth -3.62pt\hfill}%
+  }\par\vspace{1.55mm}}
 
 \newcommand{\twocol}[2]{%
   \begin{minipage}[t]{0.487\linewidth}#1\end{minipage}\hfill
   \begin{minipage}[t]{0.487\linewidth}#2\end{minipage}\par}
 
-\newcommand{\eduentry}[6]{%
-  \hbox to\linewidth{%
-    \brandmark{#1}\hspace{1.5mm}%
-    {\fontsize{10.2}{10.8}\selectfont\bfseries #2}%
-    \hspace{1.2mm}#3\hfil
-    {\fontsize{8.8}{9.4}\selectfont\bfseries #4}}%
-  \vspace{0.6mm}%
-  \hbox to\linewidth{\hspace{6.7mm}%
-    {\color{Muted}\fontsize{8.8}{9.4}\selectfont #5}\hfil
-    {\color{Muted}\fontsize{8.8}{9.4}\selectfont #6}}}
+\newcommand{\threecol}[3]{%
+  \begin{minipage}[t]{0.318\linewidth}#1\end{minipage}\hfill
+  \begin{minipage}[t]{0.318\linewidth}#2\end{minipage}\hfill
+  \begin{minipage}[t]{0.318\linewidth}#3\end{minipage}\par}
 
-\newcommand{\compline}[4]{%
-  \hbox to\linewidth{%
-    {\fontsize{9.2}{10}\selectfont\bfseries #1}\hfil
-    \medalchip{#2}{#3}\hspace{1.3mm}%
-    {\color{Muted}\fontsize{8.6}{9.2}\selectfont #4}}%
-  \vspace{1.0mm}}
+\newcommand{\eduentry}[6]{%
+  \begin{tcolorbox}[
+    colback=Surface,
+    colframe=Rule,
+    boxrule=0.28pt,
+    arc=0.9mm,
+    left=1.7mm,
+    right=1.7mm,
+    top=1.25mm,
+    bottom=1.15mm,
+    boxsep=0pt,
+    before skip=0pt,
+    after skip=0pt
+  ]
+    \hbox to\linewidth{%
+      \brandmark{#1}\hspace{1.45mm}%
+      {\fontsize{9.9}{10.5}\selectfont\bfseries #2}\hfil
+      {\color{Ink}\fontsize{8.55}{9.1}\selectfont\bfseries #4}}%
+    \vspace{0.65mm}%
+    \hbox to\linewidth{\hspace{6.85mm}%
+      {\color{Muted}\fontsize{8.45}{9.0}\selectfont #5}\hfil
+      #3\hspace{1.2mm}%
+      {\color{Muted}\fontsize{8.35}{8.9}\selectfont #6}}%
+  \end{tcolorbox}}
+
+\newcommand{\awardcard}[4]{%
+  \begin{tcolorbox}[
+    colback=Surface,
+    colframe=Rule,
+    boxrule=0.28pt,
+    arc=0.9mm,
+    left=1.65mm,
+    right=1.65mm,
+    top=1.15mm,
+    bottom=1.05mm,
+    boxsep=0pt,
+    before skip=0pt,
+    after skip=0pt
+  ]
+    \hbox to\linewidth{%
+      {\fontsize{8.9}{9.6}\selectfont\bfseries #1}\hfil}%
+    \vspace{0.75mm}%
+    \hbox to\linewidth{%
+      \medalchip{#2}{#3}\hfil
+      {\color{Muted}\fontsize{8.25}{8.8}\selectfont #4}}%
+  \end{tcolorbox}}
 
 \newcommand{\cventry}[5]{%
   \begin{tcolorbox}[
-    colback=Surface,
+    colback=AccentSurface,
     colframe=Accent,
     boxrule=0pt,
-    leftrule=2.4pt,
-    arc=0.8mm,
-    left=2.6mm,
-    right=2.8mm,
-    top=1.4mm,
-    bottom=1.4mm,
+    leftrule=2.05pt,
+    arc=0.85mm,
+    left=2.45mm,
+    right=2.6mm,
+    top=1.25mm,
+    bottom=1.25mm,
     boxsep=0pt,
-    before skip=2.4mm,
-    after skip=1.5mm
+    before skip=2.15mm,
+    after skip=1.25mm
   ]
     \hbox to\linewidth{%
-      \brandmark{#1}\hspace{1.7mm}%
-      {\color{Accent}\fontsize{10.8}{11.4}\selectfont\bfseries #2}%
-      \hspace{1.7mm}%
-      {\color{Muted}\fontsize{9.2}{9.8}\selectfont #3}\hfil
-      {\fontsize{9.2}{9.8}\selectfont\bfseries #4}%
-      \ifstrempty{#5}{}{\hspace{1.4mm}\rolechip{#5}}}
+      \brandmark{#1}\hspace{1.55mm}%
+      {\color{AccentStrong}\fontsize{10.45}{11.0}\selectfont\bfseries #2}%
+      \hspace{1.55mm}%
+      {\color{Muted}\fontsize{8.95}{9.5}\selectfont #3}\hfil
+      {\fontsize{8.95}{9.5}\selectfont\bfseries #4}%
+      \ifstrempty{#5}{}{\hspace{1.35mm}\rolechip{#5}}}
   \end{tcolorbox}}
 
-\newcommand{\ptick}{{\color{Accent}\rule[-0.35mm]{2.0pt}{3.2mm}}\hspace{1.8mm}}
+\newcommand{\ptick}{%
+  {\color{Accent}\rule[-0.28mm]{1.65pt}{3.0mm}}\hspace{1.6mm}}
 \newcommand{\project}[1]{%
-  \vspace{1.6mm}\ptick
-  {\color{Accent}\fontsize{10.1}{10.8}\selectfont\bfseries #1}%
-  \par\vspace{0.7mm}}
+  \vspace{1.35mm}\ptick
+  {\color{AccentStrong}\fontsize{9.85}{10.5}\selectfont\bfseries #1}%
+  \par\vspace{0.65mm}}
 \newcommand{\projecttag}[2]{%
-  \vspace{1.6mm}\ptick
-  {\color{Accent}\fontsize{10.1}{10.8}\selectfont\bfseries #1}%
-  \hspace{1.6mm}\rolechip{#2}\par\vspace{0.7mm}}
+  \vspace{1.35mm}\ptick
+  {\color{AccentStrong}\fontsize{9.85}{10.5}\selectfont\bfseries #1}%
+  \hspace{1.45mm}\rolechip{#2}\par\vspace{0.65mm}}
 
 \newcommand{\paper}[3]{%
-  \vspace{1.5mm}%
-  {\fontsize{9.6}{11.4}\selectfont\bfseries #1}\par\vspace{0.8mm}%
-  \hbox to\linewidth{#2\hfil
-    {\color{Muted}\fontsize{8.6}{9.2}\selectfont #3}}}
+  \vspace{0.15mm}%
+  \begin{tcolorbox}[
+    colback=Surface,
+    colframe=Rule,
+    boxrule=0.28pt,
+    arc=0.9mm,
+    left=2.0mm,
+    right=2.0mm,
+    top=1.25mm,
+    bottom=1.1mm,
+    boxsep=0pt,
+    before skip=0pt,
+    after skip=0pt
+  ]
+    \hbox to\linewidth{%
+      {\fontsize{9.25}{10.5}\selectfont\bfseries #1}\hfil
+      {\color{Muted}\fontsize{8.3}{8.9}\selectfont #3}}%
+    \vspace{0.75mm}\par
+    #2%
+  \end{tcolorbox}}
 
 \setlist[itemize]{
-  leftmargin=4.6mm,
-  itemsep=0.55mm,
-  topsep=0.6mm,
+  leftmargin=4.45mm,
+  itemsep=0.50mm,
+  topsep=0.52mm,
   parsep=0pt,
   partopsep=0pt
 }
@@ -168,6 +262,6 @@
 \displaywidowpenalty=10000
 
 \begin{document}
-\fontsize{9.5}{13.6}\selectfont
+\fontsize{9.35}{13.35}\selectfont
 \input{content.tex}
 \end{document}
