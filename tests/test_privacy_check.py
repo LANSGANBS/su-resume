@@ -2,17 +2,42 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+import struct
 import subprocess
 import sys
 import tempfile
 import unittest
 from unittest import mock
+import zlib
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPOSITORY_ROOT / "scripts"))
 
 import privacy_check  # noqa: E402
+
+
+def png_chunk(chunk_type: bytes, payload: bytes) -> bytes:
+    checksum = zlib.crc32(chunk_type)
+    checksum = zlib.crc32(payload, checksum) & 0xFFFFFFFF
+    return (
+        struct.pack(">I", len(payload))
+        + chunk_type
+        + payload
+        + struct.pack(">I", checksum)
+    )
+
+
+def minimal_png(extra_chunks=()):
+    ihdr = struct.pack(">IIBBBBB", 1, 1, 8, 6, 0, 0, 0)
+    image_data = zlib.compress(b"\x00\x00\x00\x00\x00")
+    return (
+        privacy_check.PNG_SIGNATURE
+        + png_chunk(b"IHDR", ihdr)
+        + b"".join(extra_chunks)
+        + png_chunk(b"IDAT", image_data)
+        + png_chunk(b"IEND", b"")
+    )
 
 
 def rules_for(text: str):
@@ -177,6 +202,36 @@ class HistoryScannerTests(unittest.TestCase):
             }
             self.assertIn("github-token", rules)
 
+    def test_history_allows_only_valid_reviewed_png(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory)
+            self.run_git(repository, "init", "-q")
+            environment = self.commit_environment("maintainers@example.com")
+            preview = repository / "preview.png"
+            preview.write_bytes(minimal_png())
+            self.run_git(repository, "add", "preview.png")
+            self.run_git(
+                repository,
+                "commit",
+                "-q",
+                "-m",
+                "add reviewed preview",
+                env=environment,
+            )
+
+            without_allow = {
+                finding.rule
+                for finding in privacy_check.scan_history(repository)
+            }
+            self.assertIn("binary-history-blob", without_allow)
+            self.assertEqual(
+                [],
+                privacy_check.scan_history(
+                    repository,
+                    allowed_binary_extensions={".png"},
+                ),
+            )
+
 
 class FileScannerTests(unittest.TestCase):
     def test_binary_file_is_rejected(self):
@@ -210,6 +265,50 @@ class FileScannerTests(unittest.TestCase):
                 }
             self.assertIn("tracked-pdf", rules)
             self.assertIn("pdf-metadata-unchecked", rules)
+
+    def test_reviewed_png_is_structurally_validated(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "preview.png"
+            path.write_bytes(minimal_png())
+            findings = privacy_check.scan_file(
+                path,
+                "preview.png",
+                tracked=True,
+                allowed_binary_extensions={".png"},
+            )
+            self.assertEqual(findings, [])
+
+    def test_png_text_metadata_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "preview.png"
+            path.write_bytes(
+                minimal_png((png_chunk(b"tEXt", b"Author\x00Private"),))
+            )
+            rules = {
+                finding.rule
+                for finding in privacy_check.scan_file(
+                    path,
+                    "preview.png",
+                    tracked=True,
+                    allowed_binary_extensions={".png"},
+                )
+            }
+            self.assertIn("image-text-metadata", rules)
+
+    def test_fake_png_is_rejected_even_when_extension_is_allowed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "preview.png"
+            path.write_bytes(b"\x00not a png")
+            rules = {
+                finding.rule
+                for finding in privacy_check.scan_file(
+                    path,
+                    "preview.png",
+                    tracked=True,
+                    allowed_binary_extensions={".png"},
+                )
+            }
+            self.assertIn("invalid-allowed-binary", rules)
 
 
 if __name__ == "__main__":

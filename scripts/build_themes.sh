@@ -5,7 +5,7 @@ script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd -- "${script_dir}/.." && pwd)"
 cd "${repo_root}"
 
-for command_name in python3 xelatex pdfinfo; do
+for command_name in python3 xelatex pdfinfo pdftoppm; do
   if ! command -v "${command_name}" >/dev/null 2>&1; then
     echo "build-themes: required command not found: ${command_name}" >&2
     exit 2
@@ -27,6 +27,10 @@ fi
 export FORCE_SOURCE_DATE=1
 export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-946684800}"
 export TZ=UTC
+
+hash_index="${repo_root}/build/.theme-render-hashes.tsv"
+mkdir -p "${repo_root}/build"
+: >"${hash_index}"
 
 for theme in "${themes[@]}"; do
   if [[ ! "${theme}" =~ ^[a-z][a-z0-9_-]*$ ]]; then
@@ -72,6 +76,36 @@ for theme in "${themes[@]}"; do
   fi
 
   python3 "${script_dir}/privacy_check.py" "${pdf_path}"
+
+  preview_prefix="${output_dir}/${job_name}.preview"
+  preview_path="${preview_prefix}.png"
+  pdftoppm \
+    -f 1 \
+    -singlefile \
+    -png \
+    -r 96 \
+    "${pdf_path}" \
+    "${preview_prefix}" \
+    >/dev/null 2>&1
+  preview_hash="$(
+    python3 - "${preview_path}" <<'PY'
+import hashlib
+from pathlib import Path
+import sys
+
+print(hashlib.sha256(Path(sys.argv[1]).read_bytes()).hexdigest())
+PY
+  )"
+  if duplicate_theme="$(
+    awk -F '\t' -v digest="${preview_hash}" \
+      '$1 == digest { print $2; exit }' "${hash_index}"
+  )" && [[ -n "${duplicate_theme}" ]]; then
+    echo \
+      "build-themes: ${theme} renders identically to ${duplicate_theme}; theme selection may be broken" \
+      >&2
+    exit 1
+  fi
+  printf '%s\t%s\n' "${preview_hash}" "${theme}" >>"${hash_index}"
 done
 
 echo "Built and verified ${#themes[@]} theme(s)."

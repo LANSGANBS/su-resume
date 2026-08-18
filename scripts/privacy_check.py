@@ -12,13 +12,17 @@ import os
 from pathlib import Path
 import re
 import shutil
+import struct
 import subprocess
 import sys
 from typing import Iterable, List, Optional, Sequence, Set, Tuple
 from urllib.parse import parse_qsl, urlsplit
+import zlib
 
 
 MAX_FILE_BYTES = 8 * 1024 * 1024
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+PNG_METADATA_CHUNKS = {b"eXIf", b"iTXt", b"tEXt", b"zTXt"}
 EXAMPLE_DOMAINS = {"example.com", "example.net", "example.org"}
 PRIVATE_HOST_LABELS = {
     "corp",
@@ -453,6 +457,113 @@ def looks_binary(data: bytes) -> bool:
     return False
 
 
+def scan_png_data(location: str, data: bytes) -> List[Finding]:
+    """Validate a PNG and reject chunks that can carry private text metadata."""
+    if not data.startswith(PNG_SIGNATURE):
+        return [
+            Finding(
+                location,
+                None,
+                "invalid-allowed-binary",
+                "扩展名允许 PNG，但文件签名不是 PNG",
+            )
+        ]
+
+    findings: List[Finding] = []
+    offset = len(PNG_SIGNATURE)
+    seen_ihdr = False
+    seen_iend = False
+
+    while offset < len(data):
+        if offset + 12 > len(data):
+            findings.append(
+                Finding(
+                    location,
+                    None,
+                    "malformed-png",
+                    "PNG chunk 头或校验值不完整",
+                )
+            )
+            break
+
+        length = struct.unpack(">I", data[offset : offset + 4])[0]
+        chunk_type = data[offset + 4 : offset + 8]
+        data_start = offset + 8
+        data_end = data_start + length
+        chunk_end = data_end + 4
+        if chunk_end > len(data):
+            findings.append(
+                Finding(
+                    location,
+                    None,
+                    "malformed-png",
+                    "PNG chunk 长度超出文件边界",
+                )
+            )
+            break
+
+        payload = data[data_start:data_end]
+        expected_crc = struct.unpack(">I", data[data_end:chunk_end])[0]
+        actual_crc = zlib.crc32(chunk_type)
+        actual_crc = zlib.crc32(payload, actual_crc) & 0xFFFFFFFF
+        if actual_crc != expected_crc:
+            findings.append(
+                Finding(
+                    location,
+                    None,
+                    "malformed-png",
+                    "PNG chunk CRC 校验失败",
+                )
+            )
+
+        if not seen_ihdr:
+            if chunk_type != b"IHDR" or length != 13:
+                findings.append(
+                    Finding(
+                        location,
+                        None,
+                        "malformed-png",
+                        "PNG 首个 chunk 不是合法 IHDR",
+                    )
+                )
+            seen_ihdr = True
+
+        if chunk_type in PNG_METADATA_CHUNKS:
+            findings.append(
+                Finding(
+                    location,
+                    None,
+                    "image-text-metadata",
+                    "PNG 含可携带作者、路径或注释的文本/EXIF 元数据",
+                )
+            )
+
+        offset = chunk_end
+        if chunk_type == b"IEND":
+            seen_iend = True
+            if length != 0 or offset != len(data):
+                findings.append(
+                    Finding(
+                        location,
+                        None,
+                        "malformed-png",
+                        "PNG IEND 非空或文件尾含额外数据",
+                    )
+                )
+            break
+
+    if not seen_ihdr or not seen_iend:
+        findings.append(
+            Finding(
+                location,
+                None,
+                "malformed-png",
+                "PNG 缺少 IHDR 或 IEND",
+            )
+        )
+    return findings
+
+
 def safe_pdf_author(value: str) -> bool:
     normalized = " ".join(value.casefold().split())
     return not normalized or any(
@@ -582,6 +693,8 @@ def scan_file(
 
     if looks_binary(data):
         if path.suffix.casefold() in allowed_binary_extensions:
+            if path.suffix.casefold() == ".png":
+                return scan_png_data(location, data)
             return []
         return [
             Finding(
@@ -600,8 +713,13 @@ def public_commit_email(address: str) -> bool:
     return bool(address) and is_example_email(address)
 
 
-def scan_history(root: Path, max_bytes: int = MAX_FILE_BYTES) -> List[Finding]:
+def scan_history(
+    root: Path,
+    max_bytes: int = MAX_FILE_BYTES,
+    allowed_binary_extensions: Optional[Set[str]] = None,
+) -> List[Finding]:
     findings: List[Finding] = []
+    allowed_binary_extensions = allowed_binary_extensions or set()
     commits_probe = run(("git", "rev-list", "HEAD"), cwd=root)
     if commits_probe.returncode != 0:
         return [
@@ -679,11 +797,19 @@ def scan_history(root: Path, max_bytes: int = MAX_FILE_BYTES) -> List[Finding]:
 
     seen_blobs: Set[str] = set()
     for line in objects_probe.stdout.decode("utf-8", "surrogateescape").splitlines():
-        object_id = line.split(" ", 1)[0]
+        object_id, separator, object_path = line.partition(" ")
         object_type = run(("git", "cat-file", "-t", object_id), cwd=root)
         if object_type.stdout.strip() != b"blob" or object_id in seen_blobs:
             continue
         seen_blobs.add(object_id)
+
+        if separator:
+            findings.extend(
+                scan_text(
+                    "history-path:{0}".format(object_id[:12]),
+                    object_path,
+                )
+            )
 
         size_probe = run(("git", "cat-file", "-s", object_id), cwd=root)
         try:
@@ -705,6 +831,11 @@ def scan_history(root: Path, max_bytes: int = MAX_FILE_BYTES) -> List[Finding]:
         blob = run(("git", "cat-file", "blob", object_id), cwd=root)
         data = blob.stdout
         if data.startswith(b"%PDF-") or looks_binary(data):
+            extension = Path(object_path).suffix.casefold() if separator else ""
+            if extension in allowed_binary_extensions:
+                if extension == ".png":
+                    findings.extend(scan_png_data(label, data))
+                continue
             findings.append(
                 Finding(
                     label,
@@ -814,7 +945,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 )
             )
         else:
-            findings.extend(scan_history(root, args.max_bytes))
+            findings.extend(
+                scan_history(
+                    root,
+                    args.max_bytes,
+                    allowed_binary_extensions,
+                )
+            )
 
     results = unique_findings(findings)
     if results:

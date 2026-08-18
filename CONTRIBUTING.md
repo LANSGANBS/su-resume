@@ -41,7 +41,7 @@ make privacy-history
 make build
 ```
 
-`make build` 会构建 `Makefile` 中列出的每个主题，并用 `pdfinfo` 确认 PDF 恰好一页。视觉变更还应人工打开所有主题，检查溢出、孤行、字体 fallback、链接和打印效果。
+`make build` 会构建 `Makefile` 中列出的每个主题，用 `pdfinfo` 确认 PDF 恰好一页，再用 `pdftoppm` 比较首屏渲染，防止主题选择失效。视觉变更还应人工打开所有主题，检查溢出、孤行、字体 fallback、链接和打印效果。
 
 ## Commit 与 Pull Request
 
