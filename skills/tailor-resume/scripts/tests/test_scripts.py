@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import json
+import struct
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+import zlib
 
 
 SCRIPTS_DIR = Path(__file__).resolve().parents[1]
@@ -14,6 +16,29 @@ sys.path.insert(0, str(SCRIPTS_DIR))
 import privacy_audit  # noqa: E402
 import validate_fact_ledger  # noqa: E402
 import validate_resume  # noqa: E402
+
+
+def png_chunk(chunk_type: bytes, payload: bytes) -> bytes:
+    checksum = zlib.crc32(chunk_type)
+    checksum = zlib.crc32(payload, checksum) & 0xFFFFFFFF
+    return (
+        struct.pack(">I", len(payload))
+        + chunk_type
+        + payload
+        + struct.pack(">I", checksum)
+    )
+
+
+def minimal_png(extra_chunks=()) -> bytes:
+    ihdr = struct.pack(">IIBBBBB", 1, 1, 8, 6, 0, 0, 0)
+    image_data = zlib.compress(b"\x00\x00\x00\x00\x00")
+    return (
+        privacy_audit.PNG_SIGNATURE
+        + png_chunk(b"IHDR", ihdr)
+        + b"".join(extra_chunks)
+        + png_chunk(b"IDAT", image_data)
+        + png_chunk(b"IEND", b"")
+    )
 
 
 class PrivacyAuditTests(unittest.TestCase):
@@ -61,6 +86,68 @@ class PrivacyAuditTests(unittest.TestCase):
             placeholder, "content.tex", set(), []
         )
         self.assertEqual([], findings)
+
+    def test_version_number_is_not_mistaken_for_phone(self) -> None:
+        version_banner = "XeTeX Version 3.14159" + "2653-2.6-0.999998"
+        findings = privacy_audit.scan_text(
+            version_banner,
+            "build.log",
+            set(),
+            [],
+        )
+        self.assertNotIn(
+            "personal_phone",
+            {finding.category for finding in findings},
+        )
+
+    def test_github_private_email_is_allowed(self) -> None:
+        findings = privacy_audit.scan_text(
+            "noreply@github.com 123+user@users.noreply.github.com",
+            "metadata.txt",
+            set(),
+            [],
+        )
+        self.assertNotIn(
+            "personal_email",
+            {finding.category for finding in findings},
+        )
+
+    def test_clean_png_is_inspected_and_text_metadata_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            clean = root / "clean.png"
+            clean.write_bytes(minimal_png())
+            self.assertEqual(
+                [],
+                privacy_audit.scan_png(clean, "clean.png", 5_000_000),
+            )
+
+            metadata = root / "metadata.png"
+            metadata.write_bytes(
+                minimal_png((png_chunk(b"tEXt", b"Author\x00Private"),))
+            )
+            self.assertIn(
+                "image_text_metadata",
+                {
+                    finding.category
+                    for finding in privacy_audit.scan_png(
+                        metadata,
+                        "metadata.png",
+                        5_000_000,
+                    )
+                },
+            )
+
+    def test_default_excludes_skip_generated_and_test_directories(self) -> None:
+        self.assertTrue(
+            privacy_audit.should_exclude(Path("build/resume.log"), [])
+        )
+        self.assertTrue(
+            privacy_audit.should_exclude(Path("tests/fixture.txt"), [])
+        )
+        self.assertTrue(
+            privacy_audit.should_exclude(Path("resume.xdv"), [])
+        )
 
 
 class FactLedgerTests(unittest.TestCase):

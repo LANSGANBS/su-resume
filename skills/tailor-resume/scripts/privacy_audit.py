@@ -9,12 +9,14 @@ import ipaddress
 import json
 import re
 import shutil
+import struct
 import subprocess
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
 from urllib.parse import parse_qsl, urlsplit
+import zlib
 
 
 SEVERITY_RANK = {"low": 1, "medium": 2, "high": 3}
@@ -22,19 +24,38 @@ DEFAULT_EXCLUDED_PARTS = {
     ".git",
     ".mypy_cache",
     ".pytest_cache",
+    ".venv",
     "__pycache__",
+    "build",
     "node_modules",
+    "output",
+    "tests",
+    "tmp",
+}
+DEFAULT_EXCLUDED_GLOBS = {
+    "*.aux",
+    "*.fdb_latexmk",
+    "*.fls",
+    "*.log",
+    "*.out",
+    "*.synctex.gz",
+    "*.xdv",
 }
 RESERVED_DOMAINS = {"example.com", "example.org", "example.net", "localhost"}
+RESERVED_EMAILS = {"noreply@github.com"}
+RESERVED_EMAIL_DOMAINS = {"users.noreply.github.com"}
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+PNG_METADATA_CHUNKS = {b"eXIf", b"iTXt", b"tEXt", b"zTXt"}
 URL_RE = re.compile(r"https?://[^\s<>{}\\]+", re.IGNORECASE)
 EMAIL_RE = re.compile(
-    r"(?<![\w.+-])[\w.+-]+@([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+)"
+    r"(?<![\w.+-])"
+    r"([\w.+-]+@([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+))"
 )
 IPV4_RE = re.compile(r"(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}(?![\d.])")
 CN_ID_RE = re.compile(r"(?<!\d)\d{17}[\dXx](?!\d)")
 CN_MOBILE_RE = re.compile(
-    r"(?<!\d)(?:\+?\s*86(?:[\s()~.-]|\\,)*)?"
-    r"(1[3-9](?:(?:[\s()~.-]|\\,)*\d){9})(?!\d)"
+    r"(?<![\d.])(?:\+?\s*86(?:[\s()~.-]|\\,)*)?"
+    r"(1[3-9](?:(?:[\s()~.-]|\\,)*\d){9})(?![\d.])"
 )
 INTERNATIONAL_PHONE_RE = re.compile(
     r"(?<![\w+])\+\s*\d{1,3}(?:(?:[\s()~.-]|\\,)*\d){7,14}(?!\d)"
@@ -228,8 +249,13 @@ def scan_text(
     findings: list[Finding] = []
 
     for match in EMAIL_RE.finditer(text):
-        domain = match.group(1).lower()
-        if not allowed_domain(domain, RESERVED_DOMAINS):
+        address = match.group(1).lower()
+        domain = match.group(2).lower()
+        if (
+            address not in RESERVED_EMAILS
+            and domain not in RESERVED_EMAIL_DOMAINS
+            and not allowed_domain(domain, RESERVED_DOMAINS)
+        ):
             findings.append(
                 make_finding(
                     "high", "personal_email", display_path, text, match.start(), match.end()
@@ -357,10 +383,11 @@ def should_exclude(relative: Path, patterns: list[str]) -> bool:
     if any(part in DEFAULT_EXCLUDED_PARTS for part in relative.parts):
         return True
     value = relative.as_posix()
+    active_patterns = [*DEFAULT_EXCLUDED_GLOBS, *patterns]
     return any(
         fnmatch.fnmatch(value, pattern)
         or any(fnmatch.fnmatch(part, pattern) for part in relative.parts)
-        for pattern in patterns
+        for pattern in active_patterns
     )
 
 
@@ -422,6 +449,150 @@ def read_text_file(path: Path, max_bytes: int) -> tuple[str | None, str | None]:
     return data.decode("utf-8", errors="replace"), None
 
 
+def scan_png(path: Path, display_path: str, max_bytes: int) -> list[Finding]:
+    try:
+        data = path.read_bytes()
+    except OSError:
+        return [
+            Finding(
+                severity="high",
+                category="image_not_inspected",
+                path=display_path,
+                line=1,
+                column=1,
+                snippet="[PNG COULD NOT BE READ]",
+            )
+        ]
+    if len(data) > max_bytes:
+        return [
+            Finding(
+                severity="medium",
+                category="image_not_inspected",
+                path=display_path,
+                line=1,
+                column=1,
+                snippet="[PNG EXCEEDS INSPECTION SIZE LIMIT]",
+            )
+        ]
+    if not data.startswith(PNG_SIGNATURE):
+        return [
+            Finding(
+                severity="high",
+                category="malformed_png",
+                path=display_path,
+                line=1,
+                column=1,
+                snippet="[INVALID PNG SIGNATURE]",
+            )
+        ]
+
+    findings: list[Finding] = []
+    offset = len(PNG_SIGNATURE)
+    seen_ihdr = False
+    seen_iend = False
+    while offset < len(data):
+        if offset + 12 > len(data):
+            findings.append(
+                Finding(
+                    severity="high",
+                    category="malformed_png",
+                    path=display_path,
+                    line=1,
+                    column=1,
+                    snippet="[TRUNCATED PNG CHUNK]",
+                )
+            )
+            break
+        length = struct.unpack(">I", data[offset : offset + 4])[0]
+        chunk_type = data[offset + 4 : offset + 8]
+        payload_start = offset + 8
+        payload_end = payload_start + length
+        chunk_end = payload_end + 4
+        if chunk_end > len(data):
+            findings.append(
+                Finding(
+                    severity="high",
+                    category="malformed_png",
+                    path=display_path,
+                    line=1,
+                    column=1,
+                    snippet="[PNG CHUNK EXCEEDS FILE BOUNDS]",
+                )
+            )
+            break
+
+        payload = data[payload_start:payload_end]
+        expected_crc = struct.unpack(">I", data[payload_end:chunk_end])[0]
+        actual_crc = zlib.crc32(chunk_type)
+        actual_crc = zlib.crc32(payload, actual_crc) & 0xFFFFFFFF
+        if actual_crc != expected_crc:
+            findings.append(
+                Finding(
+                    severity="high",
+                    category="malformed_png",
+                    path=display_path,
+                    line=1,
+                    column=1,
+                    snippet="[PNG CRC CHECK FAILED]",
+                )
+            )
+
+        if not seen_ihdr:
+            if chunk_type != b"IHDR" or length != 13:
+                findings.append(
+                    Finding(
+                        severity="high",
+                        category="malformed_png",
+                        path=display_path,
+                        line=1,
+                        column=1,
+                        snippet="[PNG DOES NOT START WITH A VALID IHDR]",
+                    )
+                )
+            seen_ihdr = True
+
+        if chunk_type in PNG_METADATA_CHUNKS:
+            findings.append(
+                Finding(
+                    severity="high",
+                    category="image_text_metadata",
+                    path=display_path,
+                    line=1,
+                    column=1,
+                    snippet="[PNG CONTAINS TEXT OR EXIF METADATA]",
+                )
+            )
+
+        offset = chunk_end
+        if chunk_type == b"IEND":
+            seen_iend = True
+            if length != 0 or offset != len(data):
+                findings.append(
+                    Finding(
+                        severity="high",
+                        category="malformed_png",
+                        path=display_path,
+                        line=1,
+                        column=1,
+                        snippet="[INVALID PNG IEND OR TRAILING DATA]",
+                    )
+                )
+            break
+
+    if not seen_ihdr or not seen_iend:
+        findings.append(
+            Finding(
+                severity="high",
+                category="malformed_png",
+                path=display_path,
+                line=1,
+                column=1,
+                snippet="[PNG IS MISSING IHDR OR IEND]",
+            )
+        )
+    return findings
+
+
 def scan_path(
     path: Path,
     display_path: str,
@@ -457,6 +628,9 @@ def scan_path(
                 )
             ]
         return scan_text(text, display_path, allowed_domains, deny_terms)
+
+    if path.suffix.lower() == ".png":
+        return scan_png(path, display_path, max_bytes)
 
     text, error = read_text_file(path, max_bytes)
     if error:
