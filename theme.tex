@@ -1,0 +1,38 @@
+% Theme tokens. Keep semantic colors here so content never depends on a palette.
+\providecommand{\ResumeTheme}{ocean}
+
+\newcommand{\ThemeAccent}{1A56B0}
+\newcommand{\ThemeAccentSoft}{E8EEF9}
+\newcommand{\ThemeRole}{16755A}
+\newcommand{\ThemeRoleSoft}{E4F1EB}
+
+\ifstrequal{\ResumeTheme}{forest}{%
+  \renewcommand{\ThemeAccent}{176B52}%
+  \renewcommand{\ThemeAccentSoft}{E3F1EC}%
+  \renewcommand{\ThemeRole}{8A5A16}%
+  \renewcommand{\ThemeRoleSoft}{F6EEDC}%
+}{}
+\ifstrequal{\ResumeTheme}{plum}{%
+  \renewcommand{\ThemeAccent}{7446A0}%
+  \renewcommand{\ThemeAccentSoft}{F0E9F7}%
+  \renewcommand{\ThemeRole}{A04765}%
+  \renewcommand{\ThemeRoleSoft}{F8E9EF}%
+}{}
+\ifstrequal{\ResumeTheme}{graphite}{%
+  \renewcommand{\ThemeAccent}{374151}%
+  \renewcommand{\ThemeAccentSoft}{ECEFF3}%
+  \renewcommand{\ThemeRole}{596579}%
+  \renewcommand{\ThemeRoleSoft}{E9EDF2}%
+}{}
+
+\definecolor{Accent}{HTML}{\ThemeAccent}
+\definecolor{AccentSoft}{HTML}{\ThemeAccentSoft}
+\definecolor{Role}{HTML}{\ThemeRole}
+\definecolor{RoleSoft}{HTML}{\ThemeRoleSoft}
+\definecolor{Ink}{HTML}{17191C}
+\definecolor{Muted}{HTML}{69717D}
+\definecolor{Rule}{HTML}{D7DCE2}
+\definecolor{Surface}{HTML}{F7F8FA}
+\definecolor{Gold}{HTML}{A97912}
+\definecolor{Silver}{HTML}{697078}
+\definecolor{Bronze}{HTML}{98582F}
