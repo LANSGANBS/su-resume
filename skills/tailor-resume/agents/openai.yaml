@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tailor Resume"
+  short_description: "Build an evidence-backed, privacy-safe LaTeX resume"
+  default_prompt: "Use $tailor-resume to turn my source materials into a polished, evidence-backed resume and verify the rendered PDF."
