@@ -1,0 +1,105 @@
+% Fictional three-degree academic example. This is a content fragment.
+
+\begin{resumeheaderblock}[2]
+  {示例研究者}
+  {数据系统与可靠机器学习研究方向}
+  \resumecontact{MAIL}
+    {\headerlink{mailto:researcher@example.com}{researcher@example.com}}
+  \resumecontact{PROFILE}
+    {\url{https://example.com/people/sample-researcher}}
+  \resumecontact{ORCID}{0000-0000-0000-0000（格式占位）}
+  \resumecontact{LOCATION}{苏州\dotsep 接受学术访问交流}
+\end{resumeheaderblock}
+
+\resumesection{教育与研究训练}[Education]
+
+\begin{resumegrid}[1][raster equal height=none]
+  \resumegriditem{%
+    \resumemetarow
+      {\resumeentrytitle{示例前沿研究院}}
+      {\resumedate{2023.09\dash2027.06}}
+    \vspace{0.25mm}
+    \resumemetarow
+      {\resumeentrydetail{计算机科学博士\thindot 数据系统方向}}
+      {\resumerolechip{博士}}}
+  \resumegriditem{%
+    \resumemetarow
+      {\resumeentrytitle{示例湖畔大学}}
+      {\resumedate{2020.09\dash2023.06}}
+    \vspace{0.25mm}
+    \resumemetarow
+      {\resumeentrydetail{软件工程硕士\thindot 分布式系统方向}}
+      {\resumerolechip{硕士}}}
+  \resumegriditem{%
+    \resumemetarow
+      {\resumeentrytitle{示例工科学院}}
+      {\resumedate{2016.09\dash2020.06}}
+    \vspace{0.25mm}
+    \resumemetarow
+      {\resumeentrydetail{计算机科学与技术\thindot 工学学士}}
+      {\resumerolechip{本科}}}
+\end{resumegrid}
+
+\resumesection{代表性论文与研究产出}[Selected Research]
+
+\resumeitemheading
+  {Bounded Recovery for Replayed Dataflow Pipelines}
+  {\resumemuted{示例系统会议\thindot 2026}}
+\resumemetarow{%
+  \resumetagchip{第一作者}\,
+  \resumetagchip{可复现实验}\,
+  \resumerolechip{论文}
+}{\resumemuted{公开复现材料}}
+\begin{resumelist}
+  \item 提出带有显式恢复边界的重放模型，并用公开合成工作负载比较恢复时间、重复计算量与状态开销。
+  \item 发布不含真实生产数据的实验脚本、配置快照和结果校验器，所有结论均可由固定随机种子重建。
+  \item 对网络抖动、检查点损坏与状态倾斜分别做敏感性分析，并公开未支持的恢复场景。
+\end{resumelist}
+
+\resumeitemheading
+  {Evidence-Aware Routing for Tool-Augmented Models}
+  {\resumemuted{示例机器学习研讨会\thindot 2025}}
+\resumemetarow{%
+  \resumetagchip{共同第一作者}\,
+  \resumetagchip{评测集}\,
+  \resumerolechip{论文}
+}{\resumemuted{双盲示例稿}}
+\begin{resumelist}
+  \item 构建区分“工具调用成功”与“证据足以支持答案”的评测协议，报告置信区间和失败类别。
+  \item 对检索缺失、工具返回冲突与无依据总结分别标注，避免用单一准确率掩盖证据链缺口。
+\end{resumelist}
+
+\begin{resumegrid}[2]
+  \resumegriditem{%
+    \lead{研究软件：ReplayBench}\par
+    \resumemuted{合成数据生成、故障注入、结果比对与版本化报告。}}
+  \resumegriditem{%
+    \lead{学术服务}\par
+    \resumemuted{维护组内复现实验清单；为示例研讨会提供外部评阅。}}
+  \resumegriditem{%
+    \lead{公开教学材料}\par
+    \resumemuted{三次数据系统阅读讨论的讲义、习题与参考实现。}}
+\end{resumegrid}
+
+\resumesection{方法与工具}[Methods]
+
+\begin{resumegrid}[2]
+  \resumegriditem{\lead{系统：}事务、复制、流处理、故障注入与可观测性。}
+  \resumegriditem{\lead{研究：}实验设计、误差分析、消融、复现与技术写作。}
+\end{resumegrid}
+
+\resumesection{教学与学术协作}[Teaching \& Service]
+
+\resumeentryband{%
+  \resumeentrytitle{示例数据系统阅读讨论}\hspace{1.45mm}%
+  \resumeentrydetail{材料维护\thindot 实验答疑\thindot 复现评审}
+}{%
+  \resumedate{2024\dash2026}\hspace{1.0mm}%
+  \resumerolechip{轮值组织}
+}
+\begin{resumelist}
+  \item 将每次讨论拆成论文主张、前置假设、实验设计和开放问题，并在会后补充可追踪的更正记录。
+  \item 为两组虚构课程实验提供故障定位清单，要求提交环境摘要、最小复现和结果差异，而不是只提交截图。
+  \item 维护匿名评阅模板，分别检查证据充分性、表达清晰度与可复现性，不用单一总分掩盖具体问题。
+  \item 汇总常见复现偏差与修订说明，保留原始结论、后续更正和适用边界之间的对应关系。
+\end{resumelist}

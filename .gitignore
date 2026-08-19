@@ -1,0 +1,14 @@
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.xdv
+*.py[cod]
+__pycache__/
+resume.pdf
+build/
+tmp/
+output/
+.DS_Store

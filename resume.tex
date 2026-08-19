@@ -1,0 +1,261 @@
+% !TEX program = xelatex
+\documentclass[10pt,a4paper,fontset=none]{ctexart}
+
+% Change this one value to ocean, forest, plum, or graphite.
+% A command-line definition takes precedence over this default.
+\providecommand{\ResumeTheme}{ocean}
+\providecommand{\ResumeDensity}{balanced}
+\providecommand{\ResumeContentFile}{content.tex}
+
+\usepackage{geometry}
+\usepackage{xcolor,tabularx,array,enumitem,tcolorbox,hyperref,fontspec,etoolbox,needspace}
+
+\IfFontExistsTF{texgyreheros-regular.otf}
+  {\setmainfont{texgyreheros-regular.otf}[
+     BoldFont=texgyreheros-bold.otf,
+     ItalicFont=texgyreheros-italic.otf,
+     BoldItalicFont=texgyreheros-bolditalic.otf]}
+  {\IfFontExistsTF{Arial}
+    {\setmainfont{Arial}}
+    {\IfFontExistsTF{Helvetica}
+      {\setmainfont{Helvetica}}
+      {\setmainfont{lmsans10-regular.otf}[
+         BoldFont=lmsans10-bold.otf,
+         ItalicFont=lmsans10-oblique.otf,
+         BoldItalicFont=lmsans10-boldoblique.otf]}}}
+
+\IfFontExistsTF{Noto Sans CJK SC}
+  {\setCJKmainfont{Noto Sans CJK SC}[BoldFont={Noto Sans CJK SC Bold}]}
+  {\IfFontExistsTF{Noto Sans SC}
+    {\setCJKmainfont{Noto Sans SC}[BoldFont={Noto Sans SC Bold}]}
+    {\IfFontExistsTF{PingFang SC}
+      {\setCJKmainfont{PingFang SC}[BoldFont={PingFang SC Semibold}]}
+      {\setCJKmainfont{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]}}}
+
+\input{theme.tex}
+\input{resume-layout.tex}
+
+\hypersetup{
+  colorlinks=true,
+  urlcolor=Link,
+  linkcolor=Link,
+  pdfborder={0 0 0},
+  pdfauthor={su-resume contributors},
+  pdftitle={su-resume — Chinese Technical Resume Template}
+}
+\urlstyle{same}
+\pagestyle{empty}
+\pagecolor{Paper}
+\color{Ink}
+
+\newcommand{\lead}[1]{{\color{Ink}\bfseries #1}}
+\newcommand{\metric}[1]{{\color{AccentStrong}\bfseries #1}}
+\newcommand{\plainlink}[2]{\href{#1}{{\color{Link}#2}}}
+\newcommand{\headerlink}[2]{\href{#1}{{\color{Link}\bfseries #2}}}
+\newcommand{\dash}{\,\textendash\,}
+\newcommand{\dotsep}{\;\textperiodcentered\;}
+\newcommand{\thindot}{\,\textperiodcentered\,}
+\newcommand{\arrow}{\;$\rightarrow$\;}
+\newcommand{\extlink}{\,\raisebox{-0.1ex}{$\scriptstyle\nearrow$}}
+\newcommand{\rowline}[2]{\hbox to\linewidth{#1\hfil #2}}
+
+\newcommand{\contactlabel}[1]{%
+  {\color{Subtle}\fontsize{6.6}{7.2}\selectfont\bfseries
+   \addfontfeature{LetterSpace=18}\MakeUppercase{#1}}}
+\newcommand{\contactvalue}[1]{%
+  {\fontsize{8.7}{10.4}\selectfont #1}}
+
+\newcommand{\resumeheader}[6]{%
+  \begin{minipage}[b]{0.52\linewidth}
+    {\fontsize{23.2}{24.0}\selectfont\bfseries #1}\par
+    \vspace{\ResumeHeaderNameGap}
+    {\color{Muted}\fontsize{9.7}{10.8}\selectfont #2}
+  \end{minipage}\hfill
+  \begin{minipage}[b]{0.46\linewidth}
+    \raggedleft\fontsize{8.9}{11.8}\selectfont
+    #3\dotsep #4\par
+    #5\dotsep #6
+  \end{minipage}\par
+  \vspace{\ResumeHeaderAfter}%
+}
+
+\newcommand{\chip}[3]{%
+  \tcbox[
+    on line,
+    nobeforeafter,
+    colback=#1,
+    colframe=#1,
+    boxrule=0pt,
+    arc=0.7mm,
+    left=1.0mm,
+    right=1.0mm,
+    top=0.30mm,
+    bottom=0.30mm,
+    boxsep=0pt
+  ]{\color{#2}\fontsize{7.45}{8.0}\selectfont\bfseries #3}}
+\newcommand{\tagchip}[1]{\chip{AccentSoft}{AccentStrong}{#1}}
+\newcommand{\rolechip}[1]{\chip{SecondarySoft}{Secondary}{#1}}
+\newcommand{\medalchip}[2]{\chip{#1!11!Paper}{#1}{#2}}
+\newcommand{\linkchip}[2]{\href{#1}{\chip{AccentSoft}{Link}{#2\extlink}}}
+
+\newcommand{\brandmark}[2][Accent]{%
+  \tcbox[
+    on line,
+    nobeforeafter,
+    colback=#1!9!Paper,
+    colframe=#1!18!Paper,
+    boxrule=0.32pt,
+    arc=0.9mm,
+    width=5.4mm,
+    height=5.4mm,
+    valign=center,
+    halign=center,
+    boxsep=0pt
+  ]{\color{#1}\fontsize{7.0}{7.0}\selectfont\bfseries #2}}
+
+\newcommand{\sectiontitle}[2]{%
+  \ResumeNeedSection
+  \vspace{\ResumeSectionBefore}%
+  \hbox to\linewidth{%
+    {\color{AccentStrong}\fontsize{12.2}{12.9}\selectfont\bfseries #1}%
+    \hspace{2.0mm}%
+    {\color{Subtle}\fontsize{7.15}{7.8}\selectfont\bfseries
+      \addfontfeature{LetterSpace=18}\MakeUppercase{#2}}%
+    \hspace{1.2mm}%
+    {\color{Rule}\leaders\hrule height 4.0pt depth -3.62pt\hfill}%
+  }\par\nobreak\vspace{\ResumeSectionAfter}\nopagebreak[4]}
+
+\newcommand{\twocol}[2]{%
+  \noindent
+  \begin{minipage}[t]{\dimexpr(\linewidth-\ResumeGridGapTwo)/2\relax}#1\end{minipage}%
+  \hspace{\ResumeGridGapTwo}%
+  \begin{minipage}[t]{\dimexpr(\linewidth-\ResumeGridGapTwo)/2\relax}#2\end{minipage}\par}
+
+\newcommand{\threecol}[3]{%
+  \noindent
+  \begin{minipage}[t]{\dimexpr(\linewidth-2\ResumeGridGapThree)/3\relax}#1\end{minipage}%
+  \hspace{\ResumeGridGapThree}%
+  \begin{minipage}[t]{\dimexpr(\linewidth-2\ResumeGridGapThree)/3\relax}#2\end{minipage}%
+  \hspace{\ResumeGridGapThree}%
+  \begin{minipage}[t]{\dimexpr(\linewidth-2\ResumeGridGapThree)/3\relax}#3\end{minipage}\par}
+
+\newcommand{\eduentry}[6]{%
+  \hbox to\linewidth{%
+    \brandmark{#1}\hspace{1.45mm}%
+    {\fontsize{9.9}{10.5}\selectfont\bfseries #2}%
+    \ifstrempty{#3}{}{\hspace{1.2mm}#3}%
+    \hfil
+    {\color{Ink}\fontsize{8.55}{9.1}\selectfont\bfseries #4}}%
+  \vspace{\ResumeCardInnerGap}%
+  \hbox to\linewidth{\hspace{6.85mm}%
+    {\color{Muted}\fontsize{8.45}{9.0}\selectfont #5}\hfil
+    {\color{Muted}\fontsize{8.35}{8.9}\selectfont #6}}}
+
+\newcommand{\awardcard}[4]{%
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X r@{}}
+    {\fontsize{8.9}{9.6}\selectfont\bfseries #1} &
+    \medalchip{#2}{#3}\hspace{1.0mm}%
+    {\color{Muted}\fontsize{8.25}{8.8}\selectfont #4}
+  \end{tabularx}}
+
+\newcommand{\cventry}[5]{%
+  \ResumeNeedEntry
+  \begin{tcolorbox}[
+    colback=AccentSurface,
+    colframe=Accent,
+    boxrule=0pt,
+    leftrule=2.05pt,
+    arc=0.85mm,
+    left=\dimexpr\ResumeCardPaddingX+0.75mm\relax,
+    right=\dimexpr\ResumeCardPaddingX+0.90mm\relax,
+    top=\ResumeCardPaddingY,
+    bottom=\ResumeCardPaddingY,
+    boxsep=0pt,
+    before skip=\ResumeEntryBefore,
+    after skip=\ResumeEntryAfter
+  ]
+    \hbox to\linewidth{%
+      \brandmark{#1}\hspace{1.55mm}%
+      {\color{AccentStrong}\fontsize{10.45}{11.0}\selectfont\bfseries #2}%
+      \hspace{1.55mm}%
+      {\color{Muted}\fontsize{8.95}{9.5}\selectfont #3}\hfil
+      {\fontsize{8.95}{9.5}\selectfont\bfseries #4}%
+      \ifstrempty{#5}{}{\hspace{1.35mm}\rolechip{#5}}}
+  \end{tcolorbox}}
+
+\newcommand{\ptick}{%
+  {\color{Accent}\rule[-0.28mm]{1.65pt}{3.0mm}}\hspace{1.6mm}}
+\newcommand{\project}[1]{%
+  \ResumeNeedProject
+  \vspace{\ResumeProjectBefore}\ptick
+  {\color{AccentStrong}\fontsize{9.85}{10.5}\selectfont\bfseries #1}%
+  \par\vspace{\ResumeProjectAfter}}
+\newcommand{\projecttag}[2]{%
+  \ResumeNeedProject
+  \vspace{\ResumeProjectBefore}\ptick
+  {\color{AccentStrong}\fontsize{9.85}{10.5}\selectfont\bfseries #1}%
+  \hspace{1.45mm}\rolechip{#2}\par\vspace{\ResumeProjectAfter}}
+
+\newcommand{\paper}[3]{%
+  \ResumeNeedEntry
+  \vspace{\ResumeProjectBefore}%
+  {\fontsize{9.25}{10.5}\selectfont\bfseries #1}\par
+  \vspace{\ResumeCardDetailGap}%
+  \hbox to\linewidth{#2\hfil
+    {\color{Muted}\fontsize{8.3}{8.9}\selectfont #3}}}
+
+% Optional composable content DSL. The legacy commands above remain available;
+% projects that include resume-components.tex gain variable-length grids,
+% headers, cards, metadata rows, and breakable lists.
+\let\ResumeLegacyChip\chip
+\let\ResumeLegacyTagChip\tagchip
+\let\ResumeLegacyRoleChip\rolechip
+\let\ResumeLegacyMedalChip\medalchip
+\let\ResumeLegacyLinkChip\linkchip
+\let\ResumeLegacyBrandMark\brandmark
+\let\ResumeLegacyRowLine\rowline
+\let\ResumeLegacyHeader\resumeheader
+\let\ResumeLegacySectionTitle\sectiontitle
+\let\ResumeLegacyTwoCol\twocol
+\let\ResumeLegacyThreeCol\threecol
+\let\ResumeLegacyEducation\eduentry
+\let\ResumeLegacyAward\awardcard
+\let\ResumeLegacyEntry\cventry
+\let\ResumeLegacyProjectTick\ptick
+\let\ResumeLegacyProject\project
+\let\ResumeLegacyProjectTag\projecttag
+\let\ResumeLegacyPaper\paper
+\InputIfFileExists{resume-components.tex}{}{}
+\let\chip\ResumeLegacyChip
+\let\tagchip\ResumeLegacyTagChip
+\let\rolechip\ResumeLegacyRoleChip
+\let\medalchip\ResumeLegacyMedalChip
+\let\linkchip\ResumeLegacyLinkChip
+\let\brandmark\ResumeLegacyBrandMark
+\let\rowline\ResumeLegacyRowLine
+\let\resumeheader\ResumeLegacyHeader
+\let\sectiontitle\ResumeLegacySectionTitle
+\let\twocol\ResumeLegacyTwoCol
+\let\threecol\ResumeLegacyThreeCol
+\let\eduentry\ResumeLegacyEducation
+\let\awardcard\ResumeLegacyAward
+\let\cventry\ResumeLegacyEntry
+\let\ptick\ResumeLegacyProjectTick
+\let\project\ResumeLegacyProject
+\let\projecttag\ResumeLegacyProjectTag
+\let\paper\ResumeLegacyPaper
+
+\setlist[itemize]{
+  leftmargin=\ResumeListLeftMargin,
+  itemsep=\ResumeListItemSep,
+  topsep=\ResumeListTopSep,
+  parsep=0pt,
+  partopsep=0pt
+}
+\renewcommand{\labelitemi}{%
+  {\color{Accent}\raisebox{0.22ex}{\scriptsize$\bullet$}}}
+
+\begin{document}
+\input{\ResumeContentFile}
+\ResumeFinalizePage
+\end{document}

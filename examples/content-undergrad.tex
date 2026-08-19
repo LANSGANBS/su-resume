@@ -1,0 +1,77 @@
+% Fictional one-degree example. This is a content fragment, not a document.
+
+\begin{resumeheaderblock}[2]
+  {示例使用者}
+  {软件工程本科生\dotsep 后端与开发工具方向}
+  \resumecontact{MAIL}
+    {\headerlink{mailto:undergrad@example.com}{undergrad@example.com}}
+  \resumecontact{CODE}
+    {\url{https://example.com/code/undergrad-sample}}
+  \resumecontact{CITY}{南京\dotsep 可远程协作}
+\end{resumeheaderblock}
+
+\resumesection{教育经历}[Education]
+
+\resumemetarow
+  {\resumeentrytitle{示例城市大学}}
+  {\resumedate{2022.09\dash2026.06}}
+\vspace{0.35mm}
+\resumemetarow
+  {\resumeentrydetail{计算机科学与技术\thindot 工学学士}}
+  {\resumetagchip{本科}\hspace{0.8mm}\resumemuted{南京}}
+
+\resumesection{课程项目与工程实践}[Selected Work]
+
+\resumeentryband{%
+  \resumeentrytitle{离线优先的学习资料索引器}\hspace{1.45mm}%
+  \resumeentrydetail{课程项目\thindot 独立实现}
+}{%
+  \resumedate{2025.03\dash2025.06}
+}
+\begin{resumelist}
+  \item \lead{索引链路：}将文档解析、分段、倒排索引与增量更新拆成可复用阶段，并以固定样例验证重建结果。
+  \item \lead{查询体验：}实现字段过滤、命中片段高亮与本地缓存，使重复查询无需重新扫描源文件。
+  \item \lead{失败处理：}为损坏文档、重复路径和中断更新补充错误分类与恢复提示，并保留可追踪的处理记录。
+  \item \lead{验收方式：}固定一组公开样例，并分别检查：
+    \begin{resumelist}[leftmargin=3.8mm,itemsep=0.2mm,topsep=0.2mm]
+      \item 全量重建与增量更新是否生成一致索引；
+      \item 删除源文件后是否同步清理旧条目。
+    \end{resumelist}
+\end{resumelist}
+
+\resumeitemheading{社团报名与排班服务}{\resumetagchip{4 人协作}}
+\begin{resumelist}
+  \item \lead{接口设计：}定义报名、候补、取消和排班冲突检查接口，以状态转换测试覆盖主要边界。
+  \item \lead{交付约束：}维护部署说明和回滚步骤，在虚构演练环境中完成两轮发布复盘。
+  \item \lead{协作记录：}用短决策记录说明接口取舍、待确认问题和负责人，避免只在临时聊天中保留上下文。
+\end{resumelist}
+
+\resumeitemheading{命令行日志观察器}{\resumemuted{Go\thindot SQLite}}
+\begin{resumelist}
+  \item 为结构化日志提供过滤、采样和时间窗口聚合，并保存可复现的查询配置。
+  \item 为无匹配结果、非法时间范围和大文件输入补充回归样例，确保错误信息可直接定位到参数。
+\end{resumelist}
+
+\resumesection{技能与协作方式}[Capabilities]
+
+\begin{resumegrid}[3]
+  \resumegriditem{\lead{工程：}Go、Java、SQL、Git 与基础 Linux 运维。}
+  \resumegriditem{\lead{质量：}单元测试、接口契约、可复现构建与变更记录。}
+  \resumegriditem{\lead{协作：}任务拆分、文档维护、代码评审与演示复盘。}
+  \resumegriditem{\lead{语言：}中文；可阅读英文技术文档。}
+\end{resumegrid}
+
+\resumesection{开源与校园协作}[Community Practice]
+
+\resumeentryband{%
+  \resumeentrytitle{示例开发者社群}\hspace{1.45mm}%
+  \resumeentrydetail{文档维护与新成员支持}
+}{%
+  \resumedate{2024.09\dash 至今}\hspace{1.0mm}%
+  \resumerolechip{志愿协作}
+}
+\begin{resumelist}
+  \item \lead{问题归档：}把重复出现的安装与配置问题整理成最小复现、已知限制和验证步骤，避免只保留聊天结论。
+  \item \lead{入门任务：}将一个较大的维护需求拆成可独立验收的小任务，并为每项任务标注上下文、边界和完成标准。
+  \item \lead{公开边界：}示例仓库只保留虚构数据和保留域链接；提交前检查源文件、生成物与版本历史。
+\end{resumelist}

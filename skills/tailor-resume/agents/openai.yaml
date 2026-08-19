@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tailor Resume"
+  short_description: "Adapt and fit a privacy-safe, evidence-backed resume"
+  default_prompt: "Use $tailor-resume to preserve my source wording, facts, order, privacy, and reference style; compose arbitrary sections, fit the chosen page target, verify the rendered PDF, and ask before editorial changes."

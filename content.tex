@@ -1,0 +1,131 @@
+% Replace the fictional sample content below with your own information.
+
+\begin{resumeheaderblock}[2]
+  {你的名字}
+  {软件工程师\dotsep 2027 届硕士}
+  \resumecontact{TEL}{(+86) 1XX\,XXXX\,XXXX}
+  \resumecontact{MAIL}
+    {\headerlink{mailto:you@example.com}{you@example.com}}
+  \resumecontact{GITHUB}
+    {\headerlink{https://example.com/code/yourname}{example.com/yourname}}
+  \resumecontact{WEB}
+    {\headerlink{https://example.com}{yourname.example}}
+\end{resumeheaderblock}
+
+\resumesection{教育经历}[Education]
+
+\begin{resumegrid}[2]
+  \resumegriditem{%
+    \resumemetarow
+      {\resumemark{U}\hspace{1.35mm}\resumeentrytitle{示例大学}}
+      {\resumedate{2024.09\dash2027.06}}
+    \vspace{0.35mm}
+    \resumemetarow
+      {\resumeentrydetail{软件工程\thindot 工学硕士}}
+      {\resumetagchip{硕士}\,\resumetagchip{计算机}\hspace{0.9mm}%
+       \resumemuted{上海}}}
+  \resumegriditem{%
+    \resumemetarow
+      {\resumemark{T}\hspace{1.35mm}\resumeentrytitle{示例理工学院}}
+      {\resumedate{2020.09\dash2024.06}}
+    \vspace{0.35mm}
+    \resumemetarow
+      {\resumeentrydetail{计算机科学与技术\thindot 工学学士}}
+      {\resumetagchip{本科}\hspace{0.9mm}\resumemuted{杭州}}}
+\end{resumegrid}
+
+\resumesection{专业亮点}[Highlights]
+
+\begin{resumegrid}[3]
+  \resumegriditem{%
+    \lead{示例程序设计竞赛}\par
+    \vspace{0.55mm}
+    \resumemetarow{\resumemedalchip{Gold}{一等奖}}{\resumemuted{2023.11}}}
+  \resumegriditem{%
+    \lead{示例开源软件创新赛}\par
+    \vspace{0.55mm}
+    \resumemetarow{\resumemedalchip{Silver}{二等奖}}{\resumemuted{2024.05}}}
+  \resumegriditem{%
+    \lead{校级优秀毕业设计}\par
+    \vspace{0.55mm}
+    \resumemetarow{\resumemedalchip{Bronze}{优秀奖}}{\resumemuted{2024.06}}}
+\end{resumegrid}
+
+\resumesection{实习经历}[Experience]
+
+\resumeentryband{%
+  \resumemark{A}\hspace{1.45mm}%
+  \resumeentrytitle{示例云杉科技}\hspace{1.45mm}%
+  \resumeentrydetail{AI 平台部\thindot Agent 工程师}
+}{%
+  \resumedate{2025.06\dash2025.09}\hspace{1.0mm}%
+  \resumerolechip{核心开发}
+}
+
+\resumeitemheading{智能运维 Agent 平台}{\resumerolechip{核心开发}}
+\lead{背景与目标：}面向研发团队的告警定位与标准化处置场景，建设可调用日志、监控和知识库工具的智能运维 Agent，减少重复排障工作。\par
+\vspace{0.9mm}
+\begin{resumelist}
+  \item \lead{工作流编排：}设计“意图识别\arrow 工具规划\arrow 证据校验\arrow 结果总结”闭环，将常见问题平均定位耗时降低 \metric{45\%}。
+  \item \lead{工具与知识接入：}统一封装日志查询、指标检索和知识库能力，引入租户隔离、超时重试与审计记录，覆盖 \metric{20+} 类常见场景。
+  \item \lead{评测与上线：}基于历史案例构建离线评测集，从工具选择、证据完整性和答案准确性三个维度评分，使端到端任务通过率提升至 \metric{82\%}。
+\end{resumelist}
+
+\resumeitemheading{平台后端工程}{}
+\begin{resumelist}
+  \item \lead{幂等与一致性：}使用唯一键、状态机和事务消息治理重复请求与异步回调乱序，核心链路异常重试成功率提升至 \metric{99.9\%}。
+  \item \lead{查询性能：}将多表实时聚合改为事件驱动的读模型，P95 延迟由 \metric{1.8s} 降至 \metric{180ms}。
+\end{resumelist}
+
+\vspace{1.8mm}
+\resumeentryband{%
+  \resumemark{B}\hspace{1.45mm}%
+  \resumeentrytitle{示例星河网络}\hspace{1.45mm}%
+  \resumeentrydetail{数据平台组\thindot 后端工程师}
+}{%
+  \resumedate{2024.07\dash2024.10}\hspace{1.0mm}%
+  \resumerolechip{实习}
+}
+
+\resumeitemheading{数据资产管理平台}{}
+\begin{resumelist}
+  \item \lead{任务调度：}实现支持失败重试、并发控制和运行记录的任务编排模块，日均稳定执行 \metric{10k+} 个任务实例。
+  \item \lead{权限治理：}以角色与资源标签组合授权，补充操作审计和到期回收机制，权限申请平均处理时间缩短 \metric{60\%}。
+\end{resumelist}
+
+\resumesection{个人项目}[Projects]
+
+\resumeentryband{%
+  \resumemark{C}\hspace{1.45mm}%
+  \resumeentrytitle{ContextDock（示例）}\hspace{1.45mm}%
+  \resumeentrydetail{Coding Agent 本地工作台}
+}{%
+  \resumedate{2025.11\dash 至今}\hspace{1.0mm}%
+  \resumerolechip{独立开发}
+}
+\resumemetarow{%
+  \headerlink
+    {https://example.com/code/contextdock}
+    {example.com/contextdock}\extlink
+}{%
+  {\color{Muted}\fontsize{9.0}{9.6}\selectfont
+    TypeScript\thindot Rust\thindot SQLite}%
+}\par
+\vspace{1.0mm}
+\lead{项目简介：}统一管理不同 Coding Agent 的会话、任务与上下文，在本地提供可检索历史、可审查工作流和长期记忆。\par
+\vspace{0.9mm}
+\begin{resumelist}
+  \item \lead{统一会话模型：}将多种 Agent 协议归一为 Session / Turn / Message / Tool Call，支持增量索引与跨会话检索。
+  \item \lead{可恢复工作流：}以 DAG、检查点和操作账本记录执行状态，在任务中断后按依赖关系安全续跑。
+  \item \lead{本地优先：}默认将数据与索引保存在本地，敏感配置使用系统凭据存储，并提供细粒度工具授权。
+\end{resumelist}
+
+\resumesection{研究与写作}[Research]
+
+\resumemetarow
+  {\resumeentrytitle{Evidence-Grounded Planning for Tool-Using Language Models}}
+  {\resumemuted{2026.03}}
+\vspace{0.35mm}
+\resumetagchip{Agent}\,
+\resumetagchip{Evaluation}\,
+\resumerolechip{示例论文}

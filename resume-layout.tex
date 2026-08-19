@@ -1,0 +1,365 @@
+% Adaptive, semantic layout profiles for the resume template.
+%
+% Public entry points:
+%   \ResumeDensity       airy | balanced | compact | dense
+%   \ResumeContentFile   content file selected by resume.tex
+%   \ResumePageFill      natural | elastic (fit-tool controlled)
+%
+% Components should consume the public lengths and helpers below instead of
+% embedding profile-specific dimensions.  The defaults intentionally keep
+% every stretch component finite: \flushbottom can distribute a modest amount
+% of spare height, while the fit tool moves to a more suitable profile rather
+% than relying on \vfill or negative spacing.
+
+\providecommand{\ResumeDensity}{balanced}
+\providecommand{\ResumeContentFile}{content.tex}
+\providecommand{\ResumePageFill}{natural}
+
+\newlength{\ResumeBaseFontSize}
+\newlength{\ResumeBaseLineHeight}
+\newlength{\ResumeMarginTop}
+\newlength{\ResumeMarginBottom}
+\newlength{\ResumeMarginLeft}
+\newlength{\ResumeMarginRight}
+
+\newlength{\ResumeSectionBefore}
+\newlength{\ResumeSectionAfter}
+\newlength{\ResumeCardBefore}
+\newlength{\ResumeCardAfter}
+\newlength{\ResumeCardPaddingX}
+\newlength{\ResumeCardPaddingY}
+\newlength{\ResumeGridGap}
+\newlength{\ResumeGridGapTwo}
+\newlength{\ResumeGridGapThree}
+\newlength{\ResumeListItemSep}
+\newlength{\ResumeListTopSep}
+\newlength{\ResumeListLeftMargin}
+
+\newlength{\ResumeHeaderLabelGap}
+\newlength{\ResumeHeaderNameGap}
+\newlength{\ResumeHeaderAfter}
+\newlength{\ResumeHeaderKeepSpace}
+\newlength{\ResumeHeaderColumnGap}
+\newlength{\ResumeContactColumnGap}
+\newlength{\ResumeContactRowGap}
+\newlength{\ResumeCardInnerGap}
+\newlength{\ResumeCardDetailGap}
+\newlength{\ResumeGridRowGap}
+\newlength{\ResumeProjectBefore}
+\newlength{\ResumeProjectAfter}
+\newlength{\ResumeEntryBefore}
+\newlength{\ResumeEntryAfter}
+\newlength{\ResumeEntryColumnGap}
+\newlength{\ResumeMetaColumnGap}
+\newlength{\ResumeChipMaxWidth}
+
+\newlength{\ResumeSectionNeedspace}
+\newlength{\ResumeBandNeedspace}
+\newlength{\ResumeEntryNeedspace}
+\newlength{\ResumeProjectNeedspace}
+
+% Optional component-level rhythm tokens for downstream content DSLs.
+\newlength{\ResumeSpaceXS}
+\newlength{\ResumeSpaceS}
+\newlength{\ResumeSpaceM}
+\newlength{\ResumeSpaceL}
+
+\newif\ifResumeFlushBottom
+\newif\ifResumeElasticPageFill
+
+\newcommand{\ResumeUseAiryDensity}{%
+  \ResumeFlushBottomtrue
+  \setlength{\ResumeBaseFontSize}{9.60pt}%
+  \setlength{\ResumeBaseLineHeight}{14.20pt}%
+  \setlength{\ResumeMarginTop}{12mm}%
+  \setlength{\ResumeMarginBottom}{12mm}%
+  \setlength{\ResumeMarginLeft}{13mm}%
+  \setlength{\ResumeMarginRight}{13mm}%
+  \setlength{\ResumeSectionBefore}{4.45mm plus 1.30mm minus 0.35mm}%
+  \setlength{\ResumeSectionAfter}{2.20mm plus 0.60mm minus 0.20mm}%
+  \setlength{\ResumeCardBefore}{0.25mm plus 0.30mm minus 0.10mm}%
+  \setlength{\ResumeCardAfter}{0.35mm plus 0.35mm minus 0.12mm}%
+  \setlength{\ResumeCardPaddingX}{1.95mm}%
+  \setlength{\ResumeCardPaddingY}{1.55mm}%
+  \setlength{\ResumeGridGap}{3.40mm}%
+  \setlength{\ResumeGridGapTwo}{4.78mm}%
+  \setlength{\ResumeGridGapThree}{4.23mm}%
+  \setlength{\ResumeListItemSep}{1.05mm plus 0.35mm minus 0.09mm}%
+  \setlength{\ResumeListTopSep}{0.95mm plus 0.35mm minus 0.09mm}%
+  \setlength{\ResumeListLeftMargin}{4.70mm}%
+  \setlength{\ResumeHeaderLabelGap}{1.20mm}%
+  \setlength{\ResumeHeaderNameGap}{1.50mm}%
+  \setlength{\ResumeHeaderAfter}{2.75mm plus 0.80mm minus 0.15mm}%
+  \setlength{\ResumeHeaderKeepSpace}{25mm}%
+  \setlength{\ResumeHeaderColumnGap}{4.4mm}%
+  \setlength{\ResumeContactColumnGap}{2.8mm}%
+  \setlength{\ResumeContactRowGap}{1.28mm}%
+  \setlength{\ResumeCardInnerGap}{0.78mm}%
+  \setlength{\ResumeCardDetailGap}{0.86mm}%
+  \setlength{\ResumeGridRowGap}{2.05mm}%
+  \setlength{\ResumeProjectBefore}{1.75mm plus 0.45mm minus 0.12mm}%
+  \setlength{\ResumeProjectAfter}{0.90mm plus 0.30mm minus 0.08mm}%
+  \setlength{\ResumeEntryBefore}{2.80mm plus 0.70mm minus 0.15mm}%
+  \setlength{\ResumeEntryAfter}{1.70mm plus 0.50mm minus 0.12mm}%
+  \setlength{\ResumeEntryColumnGap}{2.6mm}%
+  \setlength{\ResumeMetaColumnGap}{2.4mm}%
+  \setlength{\ResumeChipMaxWidth}{43mm}%
+  \setlength{\ResumeSectionNeedspace}{22mm}%
+  \setlength{\ResumeBandNeedspace}{32mm}%
+  \setlength{\ResumeEntryNeedspace}{18mm}%
+  \setlength{\ResumeProjectNeedspace}{15mm}%
+  \setlength{\ResumeSpaceXS}{0.45mm}%
+  \setlength{\ResumeSpaceS}{0.85mm}%
+  \setlength{\ResumeSpaceM}{1.35mm}%
+  \setlength{\ResumeSpaceL}{1.95mm}%
+}
+
+\newcommand{\ResumeUseBalancedDensity}{%
+  \ResumeFlushBottomfalse
+  \setlength{\ResumeBaseFontSize}{9.35pt}%
+  \setlength{\ResumeBaseLineHeight}{13.35pt}%
+  \setlength{\ResumeMarginTop}{10.5mm}%
+  \setlength{\ResumeMarginBottom}{10.5mm}%
+  \setlength{\ResumeMarginLeft}{12mm}%
+  \setlength{\ResumeMarginRight}{12mm}%
+  \setlength{\ResumeSectionBefore}{1.20mm plus 0.35mm minus 0.25mm}%
+  \setlength{\ResumeSectionAfter}{0.50mm plus 0.20mm minus 0.15mm}%
+  \setlength{\ResumeCardBefore}{0pt plus 0.12mm}%
+  \setlength{\ResumeCardAfter}{0pt plus 0.14mm}%
+  \setlength{\ResumeCardPaddingX}{1.70mm}%
+  \setlength{\ResumeCardPaddingY}{1.25mm}%
+  \setlength{\ResumeGridGap}{4.50mm}%
+  % Match the original .487/.318 column fractions at the 186mm text width.
+  \setlength{\ResumeGridGapTwo}{4.836mm}%
+  \setlength{\ResumeGridGapThree}{4.278mm}%
+  \setlength{\ResumeListItemSep}{0.50mm plus 0.10mm minus 0.09mm}%
+  \setlength{\ResumeListTopSep}{0.52mm plus 0.10mm minus 0.09mm}%
+  \setlength{\ResumeListLeftMargin}{4.45mm}%
+  \setlength{\ResumeHeaderLabelGap}{1.10mm}%
+  \setlength{\ResumeHeaderNameGap}{1.40mm}%
+  \setlength{\ResumeHeaderAfter}{1.50mm plus 0.20mm minus 0.14mm}%
+  \setlength{\ResumeHeaderKeepSpace}{24mm}%
+  \setlength{\ResumeHeaderColumnGap}{4.2mm}%
+  \setlength{\ResumeContactColumnGap}{2.6mm}%
+  \setlength{\ResumeContactRowGap}{1.15mm}%
+  \setlength{\ResumeCardInnerGap}{0.65mm}%
+  \setlength{\ResumeCardDetailGap}{0.75mm}%
+  \setlength{\ResumeGridRowGap}{1.55mm}%
+  \setlength{\ResumeProjectBefore}{0.80mm plus 0.12mm minus 0.09mm}%
+  \setlength{\ResumeProjectAfter}{0.35mm plus 0.08mm minus 0.06mm}%
+  \setlength{\ResumeEntryBefore}{1.10mm plus 0.16mm minus 0.12mm}%
+  \setlength{\ResumeEntryAfter}{0.60mm plus 0.12mm minus 0.09mm}%
+  \setlength{\ResumeEntryColumnGap}{2.4mm}%
+  \setlength{\ResumeMetaColumnGap}{2.2mm}%
+  \setlength{\ResumeChipMaxWidth}{42mm}%
+  \setlength{\ResumeSectionNeedspace}{18mm}%
+  \setlength{\ResumeBandNeedspace}{32mm}%
+  \setlength{\ResumeEntryNeedspace}{17mm}%
+  \setlength{\ResumeProjectNeedspace}{14mm}%
+  \setlength{\ResumeSpaceXS}{0.35mm}%
+  \setlength{\ResumeSpaceS}{0.72mm}%
+  \setlength{\ResumeSpaceM}{1.15mm}%
+  \setlength{\ResumeSpaceL}{1.75mm}%
+}
+
+\newcommand{\ResumeUseCompactDensity}{%
+  \ResumeFlushBottomtrue
+  \setlength{\ResumeBaseFontSize}{9.20pt}%
+  \setlength{\ResumeBaseLineHeight}{12.70pt}%
+  \setlength{\ResumeMarginTop}{9.2mm}%
+  \setlength{\ResumeMarginBottom}{9.2mm}%
+  \setlength{\ResumeMarginLeft}{11.2mm}%
+  \setlength{\ResumeMarginRight}{11.2mm}%
+  \setlength{\ResumeSectionBefore}{2.75mm plus 0.50mm minus 0.34mm}%
+  \setlength{\ResumeSectionAfter}{1.25mm plus 0.25mm minus 0.20mm}%
+  \setlength{\ResumeCardBefore}{0.12mm plus 0.10mm minus 0.08mm}%
+  \setlength{\ResumeCardAfter}{0.18mm plus 0.12mm minus 0.10mm}%
+  \setlength{\ResumeCardPaddingX}{1.45mm}%
+  \setlength{\ResumeCardPaddingY}{0.98mm}%
+  \setlength{\ResumeGridGap}{2.30mm}%
+  \setlength{\ResumeGridGapTwo}{4.36mm}%
+  \setlength{\ResumeGridGapThree}{3.86mm}%
+  \setlength{\ResumeListItemSep}{0.30mm plus 0.08mm minus 0.07mm}%
+  \setlength{\ResumeListTopSep}{0.36mm plus 0.08mm minus 0.07mm}%
+  \setlength{\ResumeListLeftMargin}{4.20mm}%
+  \setlength{\ResumeHeaderLabelGap}{0.96mm}%
+  \setlength{\ResumeHeaderNameGap}{1.22mm}%
+  \setlength{\ResumeHeaderAfter}{1.88mm plus 0.18mm minus 0.14mm}%
+  \setlength{\ResumeHeaderKeepSpace}{22mm}%
+  \setlength{\ResumeHeaderColumnGap}{3.9mm}%
+  \setlength{\ResumeContactColumnGap}{2.35mm}%
+  \setlength{\ResumeContactRowGap}{0.95mm}%
+  \setlength{\ResumeCardInnerGap}{0.54mm}%
+  \setlength{\ResumeCardDetailGap}{0.62mm}%
+  \setlength{\ResumeGridRowGap}{1.28mm}%
+  \setlength{\ResumeProjectBefore}{1.12mm plus 0.13mm minus 0.10mm}%
+  \setlength{\ResumeProjectAfter}{0.52mm plus 0.08mm minus 0.07mm}%
+  \setlength{\ResumeEntryBefore}{1.82mm plus 0.16mm minus 0.12mm}%
+  \setlength{\ResumeEntryAfter}{1.02mm plus 0.13mm minus 0.10mm}%
+  \setlength{\ResumeEntryColumnGap}{2.15mm}%
+  \setlength{\ResumeMetaColumnGap}{1.95mm}%
+  \setlength{\ResumeChipMaxWidth}{40mm}%
+  \setlength{\ResumeSectionNeedspace}{16mm}%
+  \setlength{\ResumeBandNeedspace}{32mm}%
+  \setlength{\ResumeEntryNeedspace}{15.5mm}%
+  \setlength{\ResumeProjectNeedspace}{12.5mm}%
+  \setlength{\ResumeSpaceXS}{0.28mm}%
+  \setlength{\ResumeSpaceS}{0.58mm}%
+  \setlength{\ResumeSpaceM}{0.95mm}%
+  \setlength{\ResumeSpaceL}{1.45mm}%
+}
+
+\newcommand{\ResumeUseDenseDensity}{%
+  \ResumeFlushBottomtrue
+  \setlength{\ResumeBaseFontSize}{9.00pt}%
+  \setlength{\ResumeBaseLineHeight}{12.00pt}%
+  \setlength{\ResumeMarginTop}{8mm}%
+  \setlength{\ResumeMarginBottom}{8mm}%
+  \setlength{\ResumeMarginLeft}{10.5mm}%
+  \setlength{\ResumeMarginRight}{10.5mm}%
+  \setlength{\ResumeSectionBefore}{2.30mm plus 0.42mm minus 0.30mm}%
+  \setlength{\ResumeSectionAfter}{1.00mm plus 0.20mm minus 0.16mm}%
+  \setlength{\ResumeCardBefore}{0.08mm plus 0.08mm minus 0.06mm}%
+  \setlength{\ResumeCardAfter}{0.12mm plus 0.10mm minus 0.08mm}%
+  \setlength{\ResumeCardPaddingX}{1.25mm}%
+  \setlength{\ResumeCardPaddingY}{0.78mm}%
+  \setlength{\ResumeGridGap}{2.00mm}%
+  \setlength{\ResumeGridGapTwo}{4.20mm}%
+  \setlength{\ResumeGridGapThree}{3.72mm}%
+  \setlength{\ResumeListItemSep}{0.14mm plus 0.07mm minus 0.06mm}%
+  \setlength{\ResumeListTopSep}{0.24mm plus 0.07mm minus 0.06mm}%
+  \setlength{\ResumeListLeftMargin}{4.00mm}%
+  \setlength{\ResumeHeaderLabelGap}{0.82mm}%
+  \setlength{\ResumeHeaderNameGap}{1.04mm}%
+  \setlength{\ResumeHeaderAfter}{1.62mm plus 0.16mm minus 0.12mm}%
+  \setlength{\ResumeHeaderKeepSpace}{20mm}%
+  \setlength{\ResumeHeaderColumnGap}{3.6mm}%
+  \setlength{\ResumeContactColumnGap}{2.1mm}%
+  \setlength{\ResumeContactRowGap}{0.78mm}%
+  \setlength{\ResumeCardInnerGap}{0.44mm}%
+  \setlength{\ResumeCardDetailGap}{0.50mm}%
+  \setlength{\ResumeGridRowGap}{1.08mm}%
+  \setlength{\ResumeProjectBefore}{0.92mm plus 0.11mm minus 0.09mm}%
+  \setlength{\ResumeProjectAfter}{0.42mm plus 0.07mm minus 0.06mm}%
+  \setlength{\ResumeEntryBefore}{1.52mm plus 0.14mm minus 0.11mm}%
+  \setlength{\ResumeEntryAfter}{0.82mm plus 0.11mm minus 0.09mm}%
+  \setlength{\ResumeEntryColumnGap}{1.95mm}%
+  \setlength{\ResumeMetaColumnGap}{1.78mm}%
+  \setlength{\ResumeChipMaxWidth}{38mm}%
+  \setlength{\ResumeSectionNeedspace}{14mm}%
+  \setlength{\ResumeBandNeedspace}{32mm}%
+  \setlength{\ResumeEntryNeedspace}{14mm}%
+  \setlength{\ResumeProjectNeedspace}{11mm}%
+  \setlength{\ResumeSpaceXS}{0.22mm}%
+  \setlength{\ResumeSpaceS}{0.46mm}%
+  \setlength{\ResumeSpaceM}{0.78mm}%
+  \setlength{\ResumeSpaceL}{1.18mm}%
+}
+
+\ifdefstring{\ResumeDensity}{airy}{%
+  \ResumeUseAiryDensity
+}{\ifdefstring{\ResumeDensity}{balanced}{%
+  \ResumeUseBalancedDensity
+}{\ifdefstring{\ResumeDensity}{compact}{%
+  \ResumeUseCompactDensity
+}{\ifdefstring{\ResumeDensity}{dense}{%
+  \ResumeUseDenseDensity
+}{%
+  \PackageError{resume-layout}
+    {Unknown density profile '\ResumeDensity'}
+    {Use airy, balanced, compact, or dense. Falling back to balanced.}%
+  \renewcommand{\ResumeDensity}{balanced}%
+  \ResumeUseBalancedDensity
+}}}}
+
+\ifdefstring{\ResumePageFill}{natural}{%
+  \ResumeElasticPageFillfalse
+}{\ifdefstring{\ResumePageFill}{elastic}{%
+  \ifdefstring{\ResumeDensity}{balanced}{%
+    \ResumeElasticPageFilltrue
+    \ResumeFlushBottomtrue
+    % Finite-order stretch only. The fit tool enables this overlay after the
+    % natural balanced render proves that the exact page count is underfilled.
+    \setlength{\ResumeSectionBefore}{3.25mm plus 4.50mm minus 0.40mm}%
+    \setlength{\ResumeSectionAfter}{1.55mm plus 4.50mm minus 0.24mm}%
+    \setlength{\ResumeListItemSep}{0.50mm plus 3.25mm minus 0.09mm}%
+    \setlength{\ResumeListTopSep}{0.52mm plus 3.25mm minus 0.09mm}%
+    \setlength{\ResumeHeaderAfter}{2.15mm plus 4.50mm minus 0.16mm}%
+    \setlength{\ResumeEntryBefore}{2.15mm plus 4.50mm minus 0.15mm}%
+    \setlength{\ResumeEntryAfter}{1.25mm plus 4.50mm minus 0.12mm}%
+  }{%
+    \PackageError{resume-layout}
+      {Elastic page fill requires the balanced density}
+      {Use ResumeDensity=balanced, or ResumePageFill=natural.}%
+  }%
+}{%
+  \PackageError{resume-layout}
+    {Unknown page fill mode '\ResumePageFill'}
+    {Use natural or elastic. Falling back to natural.}%
+  \renewcommand{\ResumePageFill}{natural}%
+  \ResumeElasticPageFillfalse
+}}
+
+% Select the profile font before geometry computes `heightrounded`, then repeat
+% it at begin-document because the class resets the normal font there.
+\fontsize{\ResumeBaseFontSize}{\ResumeBaseLineHeight}\selectfont
+\geometry{
+  a4paper,
+  top=\ResumeMarginTop,
+  bottom=\ResumeMarginBottom,
+  left=\ResumeMarginLeft,
+  right=\ResumeMarginRight,
+  heightrounded
+}
+
+% Exact Needspace avoids the unbounded \vfil used by unstarred \Needspace.
+% It is disabled inside minipages, where page breaking is impossible anyway.
+\newcommand{\ResumeNeedspace}[1]{%
+  \ifinner\else\Needspace*{#1}\fi}
+\newcommand{\ResumeNeedSection}{\ResumeNeedspace{\ResumeSectionNeedspace}}
+\newcommand{\ResumeNeedSectionBand}{%
+  \ResumeNeedspace{%
+    \dimexpr\ResumeSectionNeedspace+\ResumeBandNeedspace\relax}}
+\newcommand{\ResumeNeedBand}{\ResumeNeedspace{\ResumeBandNeedspace}}
+\newcommand{\ResumeNeedEntry}{\ResumeNeedspace{\ResumeEntryNeedspace}}
+\newcommand{\ResumeNeedProject}{\ResumeNeedspace{\ResumeProjectNeedspace}}
+\newcommand{\ResumeHeaderAfterSkip}{\ResumeHeaderAfter}
+
+\newcommand{\ResumeVSpaceXS}{\vspace{\ResumeSpaceXS}}
+\newcommand{\ResumeVSpaceS}{\vspace{\ResumeSpaceS}}
+\newcommand{\ResumeVSpaceM}{\vspace{\ResumeSpaceM}}
+\newcommand{\ResumeVSpaceL}{\vspace{\ResumeSpaceL}}
+
+\makeatletter
+\newcommand{\ResumeInstallFiniteTextBottom}{%
+  \def\@textbottom{\vskip\z@\@plus 10mm}%
+  \let\@texttop\relax}
+\makeatother
+
+% In elastic mode, ship the final content page before LaTeX's end-document
+% \newpage inserts an unbounded \vfil. Natural mode is intentionally a no-op.
+\newcommand{\ResumeFinalizePage}{%
+  \ifResumeElasticPageFill
+    \par\penalty-10000\relax
+  \fi}
+
+\AtBeginDocument{%
+  \fontsize{\ResumeBaseFontSize}{\ResumeBaseLineHeight}\selectfont
+  \setlength{\parindent}{0pt}%
+  \setlength{\parskip}{0pt plus 0.08pt}%
+  \setlength{\emergencystretch}{1em}%
+  \clubpenalty=10000
+  \widowpenalty=10000
+  \displaywidowpenalty=10000
+  \brokenpenalty=8000
+  \ifResumeFlushBottom
+    \flushbottom
+    \ifResumeElasticPageFill
+      % \flushbottom resets \@textbottom, so install the finite buffer after it.
+      \ResumeInstallFiniteTextBottom
+    \fi
+  \else
+    \raggedbottom
+  \fi
+  \typeout{RESUME-LAYOUT profile=\ResumeDensity fill=\ResumePageFill}%
+}

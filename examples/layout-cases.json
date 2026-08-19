@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "defaults": {
+    "manifest_validator": "skills/tailor-resume/scripts/validate_fit_manifest.py",
+    "profiles": [
+      "balanced",
+      "airy",
+      "compact",
+      "dense"
+    ],
+    "thresholds": {
+      "dpi": 120,
+      "white_threshold": 250,
+      "max_bottom_whitespace_mm": 22.0,
+      "min_page_fill_ratio": 0.62,
+      "max_page_fill_spread": 0.22,
+      "max_bottom_whitespace_spread_mm": 25.0,
+      "max_underfull": 20
+    }
+  },
+  "theme_matrix": {
+    "id": "default",
+    "content": "content.tex",
+    "themes": [
+      "ocean",
+      "forest",
+      "plum",
+      "graphite"
+    ],
+    "target_pages": 1,
+    "expected_profile": "balanced",
+    "expected_page_fill_mode": "natural",
+    "reference": {
+      "image": "assets/previews/theme-{theme}.png",
+      "page": 1,
+      "comparison_mode": "shape",
+      "page_dimension_tolerance_px": 3,
+      "bbox_edge_tolerance_ratio": 0.012,
+      "content_fill_tolerance": 0.02,
+      "ink_fill_tolerance": 0.025
+    },
+    "geometry": {
+      "page_width_px": 993,
+      "page_height_px": 1404,
+      "page_dimension_tolerance_px": 3,
+      "bbox_ratio": [
+        0.0564,
+        0.0342,
+        0.9416,
+        0.946
+      ],
+      "bbox_edge_tolerance_ratio": 0.04,
+      "content_fill_ratio": [
+        0.8,
+        0.98
+      ],
+      "bottom_whitespace_mm": [
+        5.0,
+        25.0
+      ],
+      "max_side_whitespace_mm": 20.0
+    }
+  },
+  "cases": [
+    {
+      "id": "undergrad",
+      "content": "examples/content-undergrad.tex",
+      "theme": "ocean",
+      "target_pages": 1,
+      "expected_profile": "airy",
+      "expected_page_fill_mode": "natural",
+      "thresholds": {
+        "max_bottom_whitespace_mm": 35.0,
+        "min_page_fill_ratio": 0.82
+      }
+    },
+    {
+      "id": "academic",
+      "content": "examples/content-academic.tex",
+      "theme": "ocean",
+      "target_pages": 1,
+      "expected_profile": "airy",
+      "expected_page_fill_mode": "natural",
+      "thresholds": {
+        "max_bottom_whitespace_mm": 23.0,
+        "min_page_fill_ratio": 0.86
+      }
+    },
+    {
+      "id": "unconventional",
+      "content": "examples/content-unconventional.tex",
+      "theme": "ocean",
+      "target_pages": 1,
+      "expected_profile": "airy",
+      "expected_page_fill_mode": "natural",
+      "thresholds": {
+        "max_bottom_whitespace_mm": 31.0,
+        "min_page_fill_ratio": 0.84
+      }
+    },
+    {
+      "id": "long",
+      "content": "examples/content-long.tex",
+      "theme": "ocean",
+      "target_pages": 2,
+      "expected_profile": "balanced",
+      "expected_page_fill_mode": "elastic",
+      "same_page_markers": [
+        {
+          "id": "primary-organization-band",
+          "markers": [
+            "long-primary-section-heading",
+            "long-primary-organization-band",
+            "long-primary-first-item"
+          ]
+        },
+        {
+          "id": "extended-organization-band",
+          "markers": [
+            "long-extended-section-heading",
+            "long-extended-organization-band",
+            "long-extended-first-item"
+          ]
+        }
+      ]
+    }
+  ]
+}

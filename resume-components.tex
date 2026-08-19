@@ -1,0 +1,462 @@
+% Composable, domain-neutral content components for the resume template.
+%
+% Load this file from the preamble after theme.tex. The public API deliberately
+% models visual composition (slots, cards, grids, and lists), not resume fields.
+% Existing content can keep using the compatibility commands at the end.
+
+\RequirePackage{xurl}
+\RequirePackage{needspace}
+\RequirePackage{varwidth}
+\tcbuselibrary{breakable,raster,skins}
+
+% Safe layout defaults. A layout engine may define any of these before loading
+% this file to change density without changing content.
+\providecommand{\ResumeHeaderKicker}{PROFILE}
+\providecommand{\ResumeHeaderKeepSpace}{24mm}
+\providecommand{\ResumeHeaderAfterSkip}{1.50mm}
+\providecommand{\ResumeHeaderColumnGap}{4.2mm}
+\providecommand{\ResumeContactColumnGap}{2.6mm}
+\providecommand{\ResumeContactRowGap}{1.15mm}
+\providecommand{\ResumeSectionNeedspace}{14mm}
+\providecommand{\ResumeEntryNeedspace}{11mm}
+\providecommand{\ResumeBandNeedspace}{32mm}
+\providecommand{\ResumeSectionBefore}{1.20mm}
+\providecommand{\ResumeSectionAfter}{0.50mm}
+\providecommand{\ResumeGridGap}{4.2mm}
+\providecommand{\ResumeGridGapTwo}{4.65mm}
+\providecommand{\ResumeGridGapThree}{4.15mm}
+\providecommand{\ResumeGridRowGap}{1.55mm}
+\providecommand{\ResumeCardBefore}{0pt}
+\providecommand{\ResumeCardAfter}{0pt}
+\providecommand{\ResumeCardPaddingX}{1.8mm}
+\providecommand{\ResumeCardPaddingY}{1.15mm}
+\providecommand{\ResumeEntryBefore}{1.10mm}
+\providecommand{\ResumeEntryAfter}{0.60mm}
+\providecommand{\ResumeProjectNeedspace}{11mm}
+\providecommand{\ResumeProjectBefore}{0.80mm}
+\providecommand{\ResumeProjectAfter}{0.35mm}
+\providecommand{\ResumeEntryColumnGap}{2.4mm}
+\providecommand{\ResumeMetaColumnGap}{2.2mm}
+\providecommand{\ResumeListLeftMargin}{4.45mm}
+\providecommand{\ResumeListItemSep}{0.50mm}
+\providecommand{\ResumeListTopSep}{0.52mm}
+\providecommand{\ResumeChipMaxWidth}{42mm}
+\providecommand{\ResumeHeaderNameSize}{23.2}
+\providecommand{\ResumeHeaderNameLeading}{24.4}
+\providecommand{\ResumeHeadlineSize}{9.7}
+\providecommand{\ResumeHeadlineLeading}{11.1}
+\providecommand{\ResumeSectionTitleSize}{11.9}
+\providecommand{\ResumeSectionTitleLeading}{12.6}
+\providecommand{\ResumeEntryTitleSize}{10.2}
+\providecommand{\ResumeEntryTitleLeading}{11.2}
+\providecommand{\ResumeDetailSize}{8.9}
+\providecommand{\ResumeDetailLeading}{10.2}
+\providecommand{\ResumeMetaSize}{8.35}
+\providecommand{\ResumeMetaLeading}{9.5}
+
+% Column weights must add up to 2 because tabularx sees two X columns.
+\providecommand{\ResumeHeaderLeftWeight}{0.88}
+\providecommand{\ResumeHeaderRightWeight}{1.12}
+\providecommand{\ResumeEntryLeftWeight}{1.36}
+\providecommand{\ResumeEntryRightWeight}{0.64}
+\providecommand{\ResumeMetaLeftWeight}{1.24}
+\providecommand{\ResumeMetaRightWeight}{0.76}
+
+\providecommand{\ResumeNeedspace}[1]{%
+  \ifinner\else\Needspace*{#1}\fi}
+\providecommand{\ResumeNeedSection}{%
+  \ResumeNeedspace{\ResumeSectionNeedspace}}
+\providecommand{\ResumeNeedSectionBand}{%
+  \ResumeNeedspace{%
+    \dimexpr\ResumeSectionNeedspace+\ResumeBandNeedspace\relax}}
+\providecommand{\ResumeNeedEntry}{%
+  \ResumeNeedspace{\ResumeEntryNeedspace}}
+\providecommand{\ResumeNeedBand}{%
+  \ResumeNeedspace{\ResumeBandNeedspace}}
+\providecommand{\ResumeNeedProject}{%
+  \ResumeNeedspace{\ResumeProjectNeedspace}}
+
+\providecommand{\ResumeRaggedRight}{%
+  \raggedright\arraybackslash\hspace{0pt}\setlength{\emergencystretch}{2em}}
+\providecommand{\ResumeRaggedLeft}{%
+  \raggedleft\arraybackslash\hspace{0pt}\setlength{\emergencystretch}{2em}}
+
+% Inline emphasis helpers remain useful in arbitrary sections.
+\providecommand{\lead}[1]{{\color{Ink}\bfseries #1}}
+\providecommand{\metric}[1]{{\color{AccentStrong}\bfseries #1}}
+\providecommand{\plainlink}[2]{\href{#1}{{\color{Link}#2}}}
+\providecommand{\headerlink}[2]{\href{#1}{{\color{Link}\bfseries #2}}}
+\providecommand{\dash}{\,\textendash\,}
+\providecommand{\dotsep}{\;\textperiodcentered\;}
+\providecommand{\thindot}{\,\textperiodcentered\,}
+\providecommand{\arrow}{\;$\rightarrow$\;}
+\providecommand{\extlink}{\,\raisebox{-0.1ex}{$\scriptstyle\nearrow$}}
+
+% A reusable, zero-width semantic page marker. \label emits only a deferred
+% AUX write, so the recorded page is the page that actually ships while the
+% rendered document receives no glyph, box, glue, or hyperlink target.
+\ProvideDocumentCommand{\resumepagemarker}{m}{%
+  \label{resume-page-marker:#1}}
+
+% Typography atoms. These never create a box, so they can wrap in any slot.
+\ProvideDocumentCommand{\resumeentrytitle}{m}{%
+  {\color{AccentStrong}%
+   \fontsize{\ResumeEntryTitleSize}{\ResumeEntryTitleLeading}\selectfont
+   \bfseries #1}}
+\ProvideDocumentCommand{\resumeentrydetail}{m}{%
+  {\color{Muted}%
+   \fontsize{\ResumeDetailSize}{\ResumeDetailLeading}\selectfont #1}}
+\ProvideDocumentCommand{\resumedate}{m}{%
+  {\color{Ink}%
+   \fontsize{\ResumeMetaSize}{\ResumeMetaLeading}\selectfont\bfseries #1}}
+\ProvideDocumentCommand{\resumemuted}{m}{%
+  {\color{Muted}%
+   \fontsize{\ResumeMetaSize}{\ResumeMetaLeading}\selectfont #1}}
+
+% Chips use varwidth so a long label wraps inside the current column instead of
+% widening the page. Short labels retain their natural width.
+\ProvideDocumentCommand{\resumechip}{m m +m}{%
+  \tcbox[
+    on line,
+    nobeforeafter,
+    colback=#1,
+    colframe=#2!18!Paper,
+    boxrule=0.28pt,
+    arc=0.7mm,
+    left=1.0mm,
+    right=1.0mm,
+    top=0.30mm,
+    bottom=0.30mm,
+    boxsep=0pt
+  ]{%
+    \begin{varwidth}{\ResumeChipMaxWidth}
+      \raggedright
+      \color{#2}\fontsize{7.45}{8.2}\selectfont\bfseries #3%
+    \end{varwidth}}}
+\ProvideDocumentCommand{\resumetagchip}{+m}{%
+  \resumechip{AccentSoft}{AccentStrong}{#1}}
+\ProvideDocumentCommand{\resumerolechip}{+m}{%
+  \resumechip{SecondarySoft}{Secondary}{#1}}
+\ProvideDocumentCommand{\resumemedalchip}{m +m}{%
+  \resumechip{#1!11!Paper}{#1}{#2}}
+\ProvideDocumentCommand{\resumelinkchip}{m +m}{%
+  \href{#1}{\resumechip{AccentSoft}{Link}{\nolinkurl{#2}\extlink}}}
+\providecommand{\chip}[3]{\resumechip{#1}{#2}{#3}}
+\providecommand{\tagchip}[1]{\resumetagchip{#1}}
+\providecommand{\rolechip}[1]{\resumerolechip{#1}}
+\providecommand{\medalchip}[2]{\resumemedalchip{#1}{#2}}
+\providecommand{\linkchip}[2]{\resumelinkchip{#1}{#2}}
+
+% A mark is intentionally narrow, but its content still wraps instead of
+% overflowing. Prefer a short glyph; a long label simply grows vertically.
+\ProvideDocumentCommand{\resumemark}{O{Accent} +m}{%
+  \tcbox[
+    on line,
+    nobeforeafter,
+    colback=#1!9!Paper,
+    colframe=#1!18!Paper,
+    boxrule=0.32pt,
+    arc=0.9mm,
+    left=0.35mm,
+    right=0.35mm,
+    top=0.55mm,
+    bottom=0.50mm,
+    boxsep=0pt
+  ]{%
+    \parbox{4.4mm}{%
+      \centering\color{#1}\fontsize{7.0}{7.5}\selectfont\bfseries #2}}}
+\providecommand{\brandmark}[2][Accent]{\resumemark[#1]{#2}}
+
+% Generic 1/2/3-column raster. It accepts any number of resumegriditem boxes;
+% tcolorbox starts a new row automatically when the selected column count is
+% reached. Override raster equal height=none for deliberately uneven content.
+\ProvideDocumentEnvironment{resumegrid}{O{2} O{}}{%
+  \def\ResumeResolvedGridGap{\ResumeGridGap}%
+  \ifnum#1=2\relax
+    \def\ResumeResolvedGridGap{\ResumeGridGapTwo}%
+  \fi
+  \ifnum#1=3\relax
+    \def\ResumeResolvedGridGap{\ResumeGridGapThree}%
+  \fi
+  \begin{tcbraster}[
+    raster columns=#1,
+    raster column skip=\ResumeResolvedGridGap,
+    raster row skip=\ResumeGridRowGap,
+    raster equal height=rows,
+    raster valign=top,
+    raster before skip=0pt,
+    raster after skip=0pt,
+    #2
+  ]%
+}{%
+  \end{tcbraster}%
+}
+\ProvideDocumentCommand{\resumegriditem}{+m}{%
+  \begin{tcolorbox}[
+    enhanced,
+    blankest,
+    boxsep=0pt,
+    left=0pt,
+    right=0pt,
+    top=0pt,
+    bottom=0pt,
+    before skip=0pt,
+    after skip=0pt
+  ]
+    \ResumeRaggedRight #1%
+  \end{tcolorbox}}
+
+% Variable-length contact grid and header. The body is a sequence of
+% \resumecontact items; the optional column count may be 1, 2, or 3.
+\ProvideDocumentEnvironment{resumecontactgrid}{O{2}}{%
+  \begin{tcbraster}[
+    raster columns=#1,
+    raster column skip=\ResumeContactColumnGap,
+    raster row skip=\ResumeContactRowGap,
+    raster equal height=rows,
+    raster valign=top,
+    raster before skip=0pt,
+    raster after skip=0pt
+  ]%
+}{%
+  \end{tcbraster}%
+}
+\providecommand{\contactlabel}[1]{%
+  {\color{Subtle}\fontsize{6.6}{7.2}\selectfont\bfseries
+   \addfontfeature{LetterSpace=18}\MakeUppercase{#1}}}
+\providecommand{\contactvalue}[1]{%
+  {\fontsize{8.7}{10.4}\selectfont #1}}
+\ProvideDocumentCommand{\resumecontact}{m +m}{%
+  \begin{tcolorbox}[
+    enhanced,
+    blankest,
+    boxsep=0pt,
+    left=0pt,
+    right=0pt,
+    top=0pt,
+    bottom=0pt,
+    before skip=0pt,
+    after skip=0pt
+  ]
+    \raggedleft\hspace{0pt}%
+    \contactlabel{#1}\hspace{1.25mm}\contactvalue{#2}%
+  \end{tcolorbox}}
+
+\ProvideDocumentCommand{\resumeprofileheader}{O{2} m m O{\ResumeHeaderKicker} +m}{%
+  \Needspace{\ResumeHeaderKeepSpace}%
+  \begin{minipage}[b]{0.52\linewidth}
+    {\fontsize{\ResumeHeaderNameSize}{\ResumeHeaderNameLeading}\selectfont
+     \bfseries #2}\par
+    \vspace{\ResumeHeaderNameGap}
+    {\color{Muted}%
+     \fontsize{\ResumeHeadlineSize}{\ResumeHeadlineLeading}\selectfont #3}
+  \end{minipage}\hfill
+  \begin{minipage}[b]{0.46\linewidth}
+    \begin{resumecontactgrid}[#1]
+      #5%
+    \end{resumecontactgrid}
+  \end{minipage}\par
+  \vspace{\ResumeHeaderAfterSkip}%
+}
+\ProvideDocumentEnvironment{resumeheaderblock}{O{2} m m O{\ResumeHeaderKicker} +b}{%
+  \resumeprofileheader[#1]{#2}{#3}[#4]{#5}%
+}{}
+
+% Arbitrary section title. The optional subtitle may be omitted or may contain
+% any short descriptor; both cells wrap through tabularx.
+\ProvideDocumentCommand{\resumesection}{m O{}}{%
+  \ResumeNeedSection
+  \par\addvspace{\ResumeSectionBefore}%
+  \begin{tabularx}{\linewidth}{@{}p{1.15mm}@{\hspace{1.45mm}}X@{}}
+    {\color{Accent}\rule[-0.15mm]{1.15mm}{2.75mm}} &
+    \begin{varwidth}[t]{0.76\linewidth}
+      \raggedright
+      {\color{AccentStrong}%
+       \fontsize{\ResumeSectionTitleSize}{\ResumeSectionTitleLeading}\selectfont
+       \bfseries #1}%
+      \ifstrempty{#2}{}{%
+        \hspace{1.9mm}%
+        {\color{Subtle}\fontsize{7.15}{8.2}\selectfont\bfseries
+         \addfontfeature{LetterSpace=18}\MakeUppercase{#2}}}%
+    \end{varwidth}%
+    \hspace{1.4mm}%
+    {\color{Rule}%
+     \leaders\hrule height 4.0pt depth -3.62pt\hfill\kern0pt}%
+  \end{tabularx}%
+  \par\nobreak\vspace{\ResumeSectionAfter}\nopagebreak[4]%
+}
+
+% Generic flowing card. Its body may contain arbitrary paragraphs, metadata,
+% and resumelist environments. The card is breakable when used outside a grid.
+\ProvideDocumentEnvironment{resumecard}{O{}}{%
+  \begin{tcolorbox}[
+    enhanced,
+    breakable,
+    colback=Surface,
+    colframe=Rule,
+    boxrule=0.28pt,
+    arc=0.9mm,
+    left=\ResumeCardPaddingX,
+    right=\ResumeCardPaddingX,
+    top=\ResumeCardPaddingY,
+    bottom=\ResumeCardPaddingY,
+    boxsep=0pt,
+    before skip=\ResumeCardBefore,
+    after skip=\ResumeCardAfter,
+    #1
+  ]%
+}{%
+  \end{tcolorbox}%
+}
+
+% Generic entry band with arbitrary left and right slots. Both slots are X
+% columns and therefore wrap; neither side assumes organization/date fields.
+\ProvideDocumentCommand{\resumeentryband}{O{} +m +m}{%
+  \ResumeNeedBand
+  \begin{tcolorbox}[
+    enhanced,
+    colback=AccentSurface,
+    colframe=Accent,
+    boxrule=0pt,
+    leftrule=2.05pt,
+    arc=0.85mm,
+    left=2.45mm,
+    right=2.6mm,
+    top=1.25mm,
+    bottom=1.25mm,
+    boxsep=0pt,
+    before skip=\ResumeEntryBefore,
+    after skip=\ResumeEntryAfter,
+    #1
+  ]
+    \begin{tabularx}{\linewidth}{%
+      @{}%
+      >{\hsize=\ResumeEntryLeftWeight\hsize\ResumeRaggedRight}X%
+      @{\hspace{\ResumeEntryColumnGap}}%
+      >{\hsize=\ResumeEntryRightWeight\hsize\ResumeRaggedLeft}X%
+      @{}}
+      #2 & #3
+    \end{tabularx}
+  \end{tcolorbox}%
+}
+
+% A two-slot metadata line. It is deliberately a paragraph table rather than
+% an hbox so long links, dates, labels, and technology summaries can wrap.
+\ProvideDocumentCommand{\resumemetarow}{+m +m}{%
+  \begin{tabularx}{\linewidth}{%
+    @{}%
+    >{\hsize=\ResumeMetaLeftWeight\hsize\ResumeRaggedRight}X%
+    @{\hspace{\ResumeMetaColumnGap}}%
+    >{\hsize=\ResumeMetaRightWeight\hsize\ResumeRaggedLeft}X%
+    @{}}
+    #1 & #2
+  \end{tabularx}%
+}
+
+% Compact blue subheading for projects, papers, outcomes, or any other record.
+% The right slot is optional in meaning, not in structure, and wraps safely.
+\ProvideDocumentCommand{\resumeitemheading}{+m +m}{%
+  \ResumeNeedProject
+  \vspace{\ResumeProjectBefore}%
+  \resumemetarow{%
+    {\color{Accent}\rule[-0.28mm]{1.65pt}{3.0mm}}\hspace{1.6mm}%
+    \resumeentrytitle{#1}%
+  }{%
+    #2%
+  }%
+  \par\vspace{\ResumeProjectAfter}}
+
+\ProvideDocumentEnvironment{resumelist}{O{}}{%
+  \begin{itemize}[
+    leftmargin=\ResumeListLeftMargin,
+    itemsep=\ResumeListItemSep,
+    topsep=\ResumeListTopSep,
+    parsep=0pt,
+    partopsep=0pt,
+    #1
+  ]%
+}{%
+  \end{itemize}%
+}
+
+% ---------------------------------------------------------------------------
+% Compatibility layer
+% ---------------------------------------------------------------------------
+% Historical names are fallback wrappers only. If an existing entrypoint
+% already defines them, \providecommand preserves its visual footprint exactly.
+% New content should use the namespaced composable API above.
+
+\providecommand{\rowline}[2]{\resumemetarow{#1}{#2}}
+\providecommand{\resumeheader}[6]{%
+  \resumeprofileheader[2]{#1}{#2}{%
+    \resumecontact{TEL}{#3}%
+    \resumecontact{MAIL}{#4}%
+    \resumecontact{GITHUB}{#5}%
+    \resumecontact{WEB}{#6}%
+  }}
+\providecommand{\sectiontitle}[2]{\resumesection{#1}[#2]}
+\providecommand{\twocol}[2]{%
+  \begin{resumegrid}[2]
+    \resumegriditem{#1}%
+    \resumegriditem{#2}%
+  \end{resumegrid}}
+\providecommand{\threecol}[3]{%
+  \begin{resumegrid}[3]
+    \resumegriditem{#1}%
+    \resumegriditem{#2}%
+    \resumegriditem{#3}%
+  \end{resumegrid}}
+
+\ProvideDocumentCommand{\resumelegacyeducation}{m m m m m m}{%
+  \begin{tabularx}{\linewidth}{%
+    @{}p{5.8mm}@{\hspace{1.3mm}}%
+    >{\hsize=1.34\hsize\ResumeRaggedRight}X%
+    @{\hspace{1.8mm}}%
+    >{\hsize=0.66\hsize\ResumeRaggedLeft}X@{}}
+    \resumemark{#1} &
+    {\fontsize{9.9}{10.8}\selectfont\bfseries #2} &
+    \resumedate{#4}
+  \end{tabularx}
+  \vspace{0.45mm}%
+  \begin{tabularx}{\linewidth}{%
+    @{}p{5.8mm}@{\hspace{1.3mm}}%
+    >{\hsize=1.18\hsize\ResumeRaggedRight}X%
+    @{\hspace{1.8mm}}%
+    >{\hsize=0.82\hsize\ResumeRaggedLeft}X@{}}
+    {} & \resumeentrydetail{#5} &
+    {\resumeentrydetail{#6}\par\vspace{0.25mm}#3}
+  \end{tabularx}}
+\providecommand{\eduentry}[6]{%
+  \resumelegacyeducation{#1}{#2}{#3}{#4}{#5}{#6}}
+
+\ProvideDocumentCommand{\resumelegacyaward}{m m m m}{%
+  {\fontsize{8.9}{10.0}\selectfont\bfseries #1}\par
+  \vspace{0.55mm}%
+  \resumemetarow{\resumemedalchip{#2}{#3}}{\resumemuted{#4}}}
+\providecommand{\awardcard}[4]{%
+  \resumelegacyaward{#1}{#2}{#3}{#4}}
+
+\ProvideDocumentCommand{\resumelegacyentry}{m m m m m}{%
+  \resumeentryband{%
+    \resumemark{#1}\hspace{1.45mm}%
+    \resumeentrytitle{#2}\hspace{1.45mm}\resumeentrydetail{#3}%
+  }{%
+    \resumedate{#4}%
+    \ifstrempty{#5}{}{\hspace{1.1mm}\resumerolechip{#5}}%
+  }}
+\providecommand{\cventry}[5]{%
+  \resumelegacyentry{#1}{#2}{#3}{#4}{#5}}
+
+\providecommand{\ptick}{%
+  {\color{Accent}\rule[-0.28mm]{1.65pt}{3.0mm}}\hspace{1.6mm}}
+\ProvideDocumentCommand{\resumeprojectheading}{m m}{%
+  \resumeitemheading{#1}{%
+    \ifstrempty{#2}{}{\resumerolechip{#2}}%
+  }}
+\providecommand{\project}[1]{\resumeprojectheading{#1}{}}
+\providecommand{\projecttag}[2]{\resumeprojectheading{#1}{#2}}
+
+\ProvideDocumentCommand{\resumelegacypaper}{m m m}{%
+  \resumeitemheading{#1}{\resumemuted{#3}}%
+  #2}
+\providecommand{\paper}[3]{\resumelegacypaper{#1}{#2}{#3}}
